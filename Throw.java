@@ -13,11 +13,9 @@ public class Throw { // this is wrong !!
 	public WishTree wish;
 	
 	private long[] factoriels;
-	
 	private Vector<StackWithProba> stacksWithProbas;
 	
 	
-
 	public Throw (WishTree tree, int nrDice, int nrFaces){
 		this.nrDice = nrDice;
 		this.nrFaces = nrFaces;
@@ -59,7 +57,7 @@ public class Throw { // this is wrong !!
 			// TODO opti : can delete the values of i that are superfluous (because biger intersection than some that were already rejected)
 //			//TODO opti : the for has to be replaces with a recursive thing that doesn't go deeper if the intersection is not to be calculated
 			
-			System.out.println(Integer.toBinaryString(i) + " is intersection i in binary");
+//			System.out.println(Integer.toBinaryString(i) + " is intersection i in binary");
 			
 			List<WishTree> tempChildren;
 //			WishTree currIntersec;
@@ -119,9 +117,7 @@ public class Throw { // this is wrong !!
 	}
 
 	public long ProbaBranch (Integer[] goal){ 
-//		if (!terminalBranch.getNode().isAND()){
-//			System.out.println("ERROR lastbranch called on a non AND node");
-//		}
+
 		long res;
 		
 		int goalSize = 0;
@@ -173,7 +169,7 @@ public class Throw { // this is wrong !!
 				return stack.favourableCases;
 			}
 		}
-		//only comes till here if the stack doesn't have a proba yet
+
 		System.out.println("calculating new : ");
 		long favourableCases = ProbaBranch(goal);
 		addToStacksWithProbas(goal, favourableCases);
@@ -355,70 +351,6 @@ public class Throw { // this is wrong !!
 		
 		return res;
 	}
-	
-//
-//	private WishTree intersectBranches(List<WishTree> branchesToIntersect) {
-//		WishTree intersection = new WishTree(true, false);
-//		
-//		branchesToIntersect = NormaliseChildrenForIntersect(branchesToIntersect);
-//		
-//		if ( !(branchesToIntersect.size()==0) ){ // if no element go direct to return with an empty AND tree
-//			if (branchesToIntersect.size()==1){
-//				return branchesToIntersect.get(0);
-//			}else { // at least 2 elements in branchesToIntersect
-//				
-//				intersection = branchesToIntersect.get(0);
-//				branchesToIntersect.remove(intersection);
-//				
-//				while (branchesToIntersect.size()>0){
-//					intersection = intersectTwoBranches(branchesToIntersect.get(0), intersection );
-//					if (intersection.getChildren().size() > this.nrDice){
-//						return null;
-//					}
-//					branchesToIntersect.remove(0);
-//				}
-//				
-//			}
-//		}
-//		
-//		return intersection;
-//	}
-//
-//	private WishTree intersectTwoBranches(WishTree branch1, WishTree branch2){
-//		WishTree intersection = new WishTree(true, false);
-//		WishTree clone2 = branch2.Clone(branch2);
-//		
-//		for (WishTree child : branch1.getChildren()){
-//			intersection.addChild(child);
-//			clone2.removeOneOccurenceOf(child.getNode().getNr());
-//		}
-//		if (clone2.getChildren().size() > 0){
-//			intersection.addChildren(clone2.getChildren());
-//		}
-//		
-//		return intersection;
-//		
-//		
-//	}
-//
-//	private List<WishTree> NormaliseChildrenForIntersect(List<WishTree> tempChildren) {
-//		List<WishTree> normalisedChildren = new Vector<WishTree>();
-//		
-//		for (WishTree child : tempChildren){
-//			if (child.getNode().isNR()){
-//				WishTree normChild = new WishTree(true, false);
-//				normChild.addChild(child);
-//				normalisedChildren.add(normChild);
-//			} else if (child.getNode().isAND()){
-//				normalisedChildren.add(child);
-//			} else {
-//				System.out.println("you should not see that, NormaliseChildrenForIntersect called with wrong arguments ");
-//			}
-//		}
-//		
-//		return normalisedChildren;
-//	}
-
 
 	
 	//------------------------------------------------------------------------------------------------------------------------------------

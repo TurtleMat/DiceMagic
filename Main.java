@@ -42,23 +42,23 @@ public class Main {
 		System.out.println("tree imported.");
 		System.out.println("");
 		
-		test.simplifyTree(test);
+		test.simplifyTree();
 		System.out.println("simplifying tree...");
 		System.out.println(test.toString());
 		System.out.println("tree simplified");
 		System.out.println("");
 		
-		test.developpTree(test);
+		test.developpTree();
 		System.out.println("developping tree...");
 		System.out.println(test.toString());
 		System.out.println("tree developped");
 		
-		test.normaliseTerminalBranches(test);
+		test.normaliseTerminalBranches();
 		System.out.println("normalising tree...");
 		System.out.println(test.toString());
 		System.out.println("tree normalised");
 		
-		test.removeRedundancy(test);
+		test.removeRedundancy();
 		System.out.println("removing redundency...");
 		System.out.println(test.toString());
 		System.out.println("redundencies removed");
