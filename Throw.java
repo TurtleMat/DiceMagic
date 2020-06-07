@@ -38,30 +38,133 @@ public class Throw { // this is wrong !!
 		}
 
 	}
+	
 
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------	
+	
+	
+	public long probaCompleteRec (WishTree tree){
+		int nrBranch = tree.getChildren().size();
+		Integer[] currIntersec = new Integer[nrBranch];
+		currIntersec[0] = 1;
+		for (int i =1; i<nrBranch; i++){
+			currIntersec[i] = 0;
+		}
+		
+		long res = probaCompleteNextIntersectionRec( 0, currIntersec, 0, tree);
+		
+		return res;
+	}
+	
+	
+	private long probaCompleteNextIntersectionRec( int recLevel, Integer[] currIntersec, long res, WishTree tree) {
+		
+		boolean calculateIntersection;
+		Integer[] currGoal = calculateIntersection(currIntersec, tree);
+		calculateIntersection = !(currGoal == null);
+		boolean lastDigit = (recLevel == tree.getChildren().size()-1);
+		
+		if (calculateIntersection && ! lastDigit){
+//			recLevel++;
+			int intersecSize = sizeOfIntArray(currIntersec);
+			
+			double toAdd = (probaBranchOpitForRepetitions(currGoal)) * Math.pow( (-1),intersecSize+1 );
+			res += toAdd;
+			
+			System.out.println("Adding " + (double)toAdd/Math.pow(this.nrFaces, this.nrDice) + " to the proba (" + toAdd + " favourable cases)");
+			System.out.println(goalToString(currGoal));
+			
+
+			currIntersec[recLevel+1]++;
+			res = probaCompleteNextIntersectionRec(recLevel+1, currIntersec, res , tree);
+		}
+		if (!calculateIntersection && ! lastDigit){
+//			currIntersec[recLevel] = 0;
+//			return res;
+		}
+		if (calculateIntersection && lastDigit){
+			int intersecSize = sizeOfIntArray(currIntersec);
+			
+			double toAdd = (probaBranchOpitForRepetitions(currGoal)) * Math.pow( (-1),intersecSize+1 );
+			res += toAdd;
+			
+//			System.out.println("Adding " + (double)toAdd/Math.pow(this.nrFaces, this.nrDice) + " to the proba (" + toAdd + " favourable cases)");
+//			System.out.println(goalToString(currGoal));
+			
+			return res;
+		}
+		if (!calculateIntersection && lastDigit){
+			return res;
+		}
+		
+		
+		if (currIntersec[recLevel]==0){
+			return res;
+		}
+		if (currIntersec[recLevel] == 1){
+			currIntersec[recLevel] = 0;
+			currIntersec[recLevel+1] = 1;
+			res = probaCompleteNextIntersectionRec(recLevel + 1, currIntersec, res, tree);
+			currIntersec[recLevel+1]--;
+			currIntersec[recLevel]++;
+		}
+		if (currIntersec[recLevel] != 0 &&currIntersec[recLevel] != 1){
+			System.out.println("ERROR : currIntersec of anything should be 0 or 1");
+		}
+		
+		return res;
+	}
+
+	private Integer[] calculateIntersection(Integer[] currIntersec,	WishTree tree) {
+		
+		List<WishTree> tempChildren = childrenToIntersectArray(currIntersec, tree);
+		Integer[] currGoal = new Integer[this.nrFaces];
+		for (int i =0; i<this.nrFaces;i++){
+			currGoal[i] = 0;
+		}
+		
+		int i =0;
+		boolean weiter = true;
+		while ((i<tempChildren.size()) && weiter ){
+			Integer[] tempGoal = terminalBranchToIntArray(tempChildren.get(i));
+			Integer[] testGoal = intersectGoals(currGoal, tempGoal);
+			int testSize = sizeOfGoal(testGoal);
+			if (testSize > this.nrDice){
+				return null;
+			} else {
+				currGoal = testGoal;
+				i++;
+			}
+		}
+		
+		
+		
+		return currGoal;
+	}
+
 	public long ProbaComplete (WishTree tree){// only call on developp and normalised trees
 		//at this point, node should be a OR with terminal AND children
 		
-		
 		removeBigChildren(tree);
-		
-		
 		
 //		float res = 0;
 		long res = 0;
 		int nrBranch = tree.getChildren().size(); 
 		
-		for (int i = 1; i<Math.pow(2, nrBranch); i++){ // the binary representation of i tells which child to consider
+		for (long i = 1; i<Math.pow(2, nrBranch); i++){ // the binary representation of i tells which child to consider
 			// TODO opti : can delete the values of i that are superfluous (because biger intersection than some that were already rejected)
 //			//TODO opti : the for has to be replaces with a recursive thing that doesn't go deeper if the intersection is not to be calculated
 			
 //			System.out.println(Integer.toBinaryString(i) + " is intersection i in binary");
 			
+			System.out.println(i + " < " + Math.pow(2, nrBranch) + " (nrBranch = " + nrBranch + ")");
+			
 			List<WishTree> tempChildren;
 //			WishTree currIntersec;
-			tempChildren = childrenToIntersect( i, tree);
+			tempChildren = childrenToIntersectBinRep( i, tree);
+			
+			
 			boolean calculateTheIntersection = true;
 //			currIntersec = intersectBranches(tempChildren);
 			
@@ -90,17 +193,13 @@ public class Throw { // this is wrong !!
 			}
 			
 			if (calculateTheIntersection){
-//				Integer[] currGoal = terminalBranchToIntArray(currIntersec);
 				
 //				int toAdd = (int) ( ProbaBranch(currGoal) * Math.pow( (-1),tempChildren.size()+1 ) );
 				int toAdd = (int) ( probaBranchOpitForRepetitions((currGoal)) * Math.pow( (-1),tempChildren.size()+1 ) );
 				
-//				if (toAdd != toAdd2){
-//					System.out.println("ERROR in probaBranchOpitForRepetitions");
-//				}
 				 
-				System.out.println("Adding " + (double)toAdd/Math.pow(this.nrFaces, this.nrDice) + " to the proba (" + toAdd + " favourable cases)");
-				System.out.println(goalToString(currGoal));
+//				System.out.println("Adding " + (double)toAdd/Math.pow(this.nrFaces, this.nrDice) + " to the proba (" + toAdd + " favourable cases)");
+//				System.out.println(goalToString(currGoal));
 				
 				long testMaxRes = res;
 				
@@ -165,12 +264,12 @@ public class Throw { // this is wrong !!
 		
 		for (StackWithProba stack : this.stacksWithProbas){
 			if (hasStack(goal, stack.stacks)){
-				System.out.println("using saved stacks with proba : (saved probas : " + this.stacksWithProbas.size() + ")");
+//				System.out.println("using saved stacks with proba : (saved probas : " + this.stacksWithProbas.size() + ")");
 				return stack.favourableCases;
 			}
 		}
 
-		System.out.println("calculating new : ");
+//		System.out.println("calculating new : ");
 		long favourableCases = ProbaBranch(goal);
 		addToStacksWithProbas(goal, favourableCases);
 		
@@ -264,6 +363,16 @@ public class Throw { // this is wrong !!
 		return res;
 	}
 	
+	public int sizeOfIntArray(Integer[] array){
+		int res = 0;
+		int i = 0;
+		while (i < array.length ){
+			res += array[i];
+			i++;
+		}
+		return res;
+	}
+	
 	public Integer[] intersectGoals(Integer[] goal1, Integer[] goal2){
 		for (int i = 0; i < this.nrFaces;i++){
 			goal1[i] = Math.max(goal1[i], goal2[i]);
@@ -338,12 +447,26 @@ public class Throw { // this is wrong !!
 	//------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------
 
-	private List<WishTree> childrenToIntersect(int binRepres, WishTree tree) {
+	private List<WishTree> childrenToIntersectBinRep(long binRepres, WishTree tree) {
 		List<WishTree> res = new Vector<WishTree>();
 		
 		int k = 0;
 		while (Math.pow(2,k)<= binRepres*2){ //TODO check border cases
 			if ( getBit(binRepres, k) == 1 ){
+				res.add(tree.getChildren().get(k));
+			}
+			k++;
+		}
+		
+		return res;
+	}
+	
+	private List<WishTree> childrenToIntersectArray(Integer[] intersection, WishTree tree) {
+		List<WishTree> res = new Vector<WishTree>();
+		
+		int k = 0;
+		while (k<tree.getChildren().size()){ //TODO check border cases
+			if ( intersection[k] == 1 ){
 				res.add(tree.getChildren().get(k));
 			}
 			k++;

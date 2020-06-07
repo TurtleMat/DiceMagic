@@ -103,6 +103,49 @@ public class WishTree {
 		this.children = new Vector<WishTree>();
 	}
 	
+	public static WishTree importAndPrepareTree(String encodingString, boolean verbose){
+		
+		WishTree tree = WishTree.stringToTree(encodingString);
+		if (verbose){
+			System.out.println("tree import...");
+			System.out.println(tree.toString());
+			System.out.println("tree imported.");
+			System.out.println("");
+		}
+
+		tree.simplifyTree();
+		if (verbose){
+			System.out.println("simplifying tree...");
+			System.out.println(tree.toString());
+			System.out.println("tree simplified");
+			System.out.println("");
+		}
+
+		tree.developpTree();
+		if (verbose){
+			System.out.println("developping tree...");
+			System.out.println(tree.toString());
+			System.out.println("tree developped");
+		}
+
+		tree.normaliseTerminalBranches();
+		if (verbose){
+			System.out.println("normalising tree...");
+			System.out.println(tree.toString());
+			System.out.println("tree normalised");
+		}
+
+		tree.removeRedundancy();
+		if (verbose){
+			System.out.println("removing redundency...");
+			System.out.println(tree.toString());
+			System.out.println("redundencies removed");
+		}
+
+		return tree;
+		
+	}
+	
 	//------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------	
 
