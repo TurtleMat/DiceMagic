@@ -240,19 +240,25 @@ public class WishTree {
 	public void normaliseTerminalBranches(){ // transforms nr nodes in and nodes with the number. Ex : 1  -> (AND;1)
 		int i = 0;
 		Vector<WishTree> normalisedChildren = new Vector<WishTree>();
+		WishTree leaves = new WishTree(true, false);
 		for (WishTree child : this.getChildren()){
 			if (child.getNode().isNR()){
-				WishTree normChild = new WishTree(true, false);
-				normChild.addChild(child);
-				normalisedChildren.add(normChild);
+//				WishTree normChild = new WishTree(true, false);
+				leaves.addChild(child);
+//				normalisedChildren.add(normChild);
 			} else if (child.getNode().isAND()){
 				normalisedChildren.add(child);
 			} else {
 				System.out.println("you should not see that, normaliseTerminalBranche called with wrong arguments ");
 			}
 		}
+		if (!(leaves.getChildren() == null || leaves.getChildren().isEmpty())){
+
+			normalisedChildren.add(leaves);
+		}
 		this.resetChildren();
 		this.addChildren(normalisedChildren);
+		
 	}
 	
 	//------------------------------------------------------------------------------------------------------------------------------------	
