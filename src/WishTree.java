@@ -6,13 +6,11 @@ public class WishTree {
 
 
 	private Wish node;
-	private WishTree parent;
+//	private WishTree parent;
 	private List<WishTree> children;
 
 
-	public WishTree(WishTree tree) {
-		this.node = new Wish(tree.node);
-//		this.parent = tree.parent;
+	public WishTree() {
 		this.children = new Vector<WishTree>();
 	}
 	
@@ -26,11 +24,7 @@ public class WishTree {
 		this.children = new Vector<WishTree>(); 
 	}
 
-	public WishTree() {
-		this.children = new Vector<WishTree>();
-	}
-
-	public static WishTree stringToTree(String encodingString){// (OR;(OR;1;5);( OR;(AND;1;1;1);(AND;2;2;2);(AND,3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6) ) ) should be valid
+	public static WishTree stringToTree(String encodingString){
 		int i = 0;
 		if (!(encodingString.charAt(i) =='(')){ // if it doesn't start with a parenthesis, it must be a number
 			int res;
@@ -50,32 +44,21 @@ public class WishTree {
 			while (parenthesis >0){// big while probably full of mistakes
 				char c = encodingString.charAt(i);
 				String s=String.valueOf(c);  
-				String temp;
-				
 				if (c == '('){
 					parenthesis++;
 					if (parenthesis == 2){
-//						childNr++;
 						childStrings[childNr] = s;
-						
-//						System.out.println( childStrings.elementAt(childNr) ); // test if that prints s
-//						System.out.println(s);
 					}else{
 						childStrings[childNr] += s;
 					}
 				} else if (c == ')'){
 					parenthesis--;
 					if (!(parenthesis==0)){
-
 						childStrings[childNr] += s;
 					}
 					
 				} else if (c == ';' && parenthesis == 1){
 					childNr++;
-//					int k = encodingString.indexOf(";", i);// TODO : check if indexof works like intended (first occurence of str after index)
-//					String toAdd = encodingString.substring(i, k);
-//					childStrings[childNr] = toAdd;
-					
 				}else {
 					if (childStrings[childNr] == null){
 						childStrings[childNr] = s;
@@ -105,60 +88,104 @@ public class WishTree {
 		}
 	}
 	
-	public WishTree Clone(WishTree tree){ // should recursively clone tree
-		WishTree newTree = new WishTree(tree);
-		if (tree.children != null) {
-			for (WishTree child : tree.children){
-//				this.children.add(Clone(child));
-				newTree.addChild(Clone(child));
+	public WishTree Clone(){ // Recursively clones tree
+		WishTree newTree = new WishTree(this);
+		if (this.children != null) {
+			for (WishTree child : this.children){
+				newTree.addChild(child.Clone());
 			}
 		}
-		
 		return newTree;
+	}
+	
+	public WishTree(WishTree tree) {
+		this.node = new Wish(tree.node);
+		this.children = new Vector<WishTree>();
+	}
+	
+	public static WishTree importAndPrepareTree(String encodingString, boolean verbose){
+		
+		WishTree tree = WishTree.stringToTree(encodingString);
+		if (verbose){
+			System.out.println("tree import...");
+			System.out.println(tree.toString());
+			System.out.println("tree imported.");
+			System.out.println("");
+		}
 
+		tree.simplifyTree();
+		if (verbose){
+			System.out.println("simplifying tree...");
+			System.out.println(tree.toString());
+			System.out.println("tree simplified");
+			System.out.println("");
+		}
+
+		tree.developpTree();
+		if (verbose){
+			System.out.println("developping tree...");
+			System.out.println(tree.toString());
+			System.out.println("tree developped");
+		}
+
+		tree.normaliseTerminalBranches();
+		if (verbose){
+			System.out.println("normalising tree...");
+			System.out.println(tree.toString());
+			System.out.println("tree normalised");
+		}
+
+		tree.removeRedundancy();
+		if (verbose){
+			System.out.println("removing redundency...");
+			System.out.println(tree.toString());
+			System.out.println("redundencies removed");
+		}
+
+		return tree;
+		
 	}
 	
 	//------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------	
 
-	
-	public void simplifyTree (WishTree tree){ 		// supress unnecessary parenthesis  ex : (A and B) and C becomes A and B and C
-		if (tree.children != null){
-			for (WishTree child : tree.children){
-				simplifyTree(child);
+	public void simplifyTree (){ 		// supress unnecessary parenthesis  ex : (A and B) and C becomes A and B and C
+		if (this.children != null){
+			for (WishTree child : this.children){
+				child.simplifyTree();
 			}
-			simplifyNode(tree);
+			this.simplifyNode();
 		}
 	}
 
-	public void simplifyNode (WishTree tree){
+	public void simplifyNode (){
 		Vector<WishTree> tempWrite;
 		tempWrite = new Vector<WishTree>();
 
 
-		if (tree.node.isAND()){
-			while (scanChildren(tree, true, false, false)){
-				for (WishTree child : tree.children){
+		if (this.node.isAND()){
+			while (scanChildren(this, true, false, false)){
+				for (WishTree child : this.children){
 					if (child.node.isAND()){
 						tempWrite.addAll(child.getChildren());
 					} else {
 						tempWrite.add(child);
 					}
 				}	
-				tree.children = tempWrite;
+				this.children = tempWrite;
 			} ;// while (scanChildren(this, true, false, false))
 		}
 
-		if (tree.node.isOR()){
-			while (scanChildren(tree, false, true, false)){
-				for (WishTree child : tree.children){
+		if (this.node.isOR()){
+			while (scanChildren(this, false, true, false)){
+				for (WishTree child : this.children){
 					if (child.node.isOR()){
 						tempWrite.addAll(child.getChildren());
 					} else {
 						tempWrite.add(child);
 					}
 				}
-				tree.children = tempWrite;
+				this.children = tempWrite;
 			};// while (scanChildren(this, false, true, false))
 		}
 		// at this point an AND can not have an AND as children and a OR can not have a OR
@@ -166,61 +193,23 @@ public class WishTree {
 
 	//------------------------------------------------------------------------------------------------------------------------------------	
 	
-	public void developpNode_Old (WishTree tree){  // always on a non root OR node ; always on a simplified tree ; should conserv property of being simplified
-		if (!tree.node.isOR()){
-			System.out.println("called on an AND or a number, won't do anything. this is to be expected");
-		}else{
-			if (!tree.parent.node.isAND()){
-				System.out.println("error, tree is not simplified");
-			}else{
-				tree.parent.children.remove(tree);
-
-				if (!(tree.parent.parent == null)){ // not in a border case for the root of the tree
-
-					for (WishTree child : tree.children){		//	for every child of the curr node, creates a and child on new tree corresponding to distributing multiplically
-						
-						WishTree newChild = new WishTree();
-						newChild.node = new Wish(true, false, false, -1); 
-						newChild.children.add(child);						// original child
-						for (WishTree cousin : tree.parent.getChildren()){
-							newChild.children.add(cousin);				// AND the remaining product
-						}
-						
-						newChild.SetParent(tree.parent.parent);
-
-					}
-					tree.parent.parent.children.remove(tree.parent);
-
-				}else { // there is no grandparent
-					WishTree newTree = new WishTree();
-					newTree.node = new Wish(false,true, false, -1); // new tree is a or, will be the new root
-//					tree.parent.SetParent(newTree);
-					
-					for (WishTree child : tree.children){		//	for every child of the curr node, creates a and child on new tree corresponding to distributing multiplically
-						
-						WishTree newChild = new WishTree();
-						newChild.node = new Wish(true, false, false, -1); 
-						newChild.children.add(child);						// original child
-						
-						for (WishTree cousin : tree.parent.getChildren()){
-							newChild.children.add(cousin);				// AND the remaining product
-						}
-						
-//						newChild.children.add(Clone(parent));				// AND the remaining product
-						newChild.SetParent(newTree);
-					}
-				}
+	public void developpTree(){ 		// developps the remaining parenthesis  Ex : (A or B) and C becomes (A and C) OR (B and C)
+		if (this.children != null){		// TODO check if all trees have an OR root after that
+			
+			this.developpNode();
+			this.simplifyTree();
+			
+			for (WishTree child : this.children){
+				child.developpTree();
 			}
 		}
+		this.simplifyTree();
 	}
-
-	public WishTree developpNode (WishTree tree){
+	
+	public void developpNode (){
 		
-//		System.out.println("*****************Developping node : ************");
-//		System.out.println(tree);
-		
-		if (tree.node.isAND()){
-			Vector<WishTree> orChildren = tree.getChildren(false, true, false);
+		if (this.node.isAND()){
+			Vector<WishTree> orChildren = this.getChildren(false, true, false);
 			if (!orChildren.isEmpty()){ // a AND node that has at least one OR child
 				
 				WishTree currOrChild = orChildren.firstElement();   
@@ -231,101 +220,126 @@ public class WishTree {
 					newChild.node = new Wish(true, false, false, -1);
 					newChild.addChild(grandChild);
 					
-					tree.children.remove(currOrChild);
-					for (WishTree currSiblings : tree.children){
+					this.children.remove(currOrChild);
+					for (WishTree currSiblings : this.children){
 						newChild.addChild(currSiblings);
-						newChild.parent = tree;
+//						newChild.parent = this;
 					}			
 					
 					newChildren.add(newChild);
 				}
 				
-				tree.node.setToOr();
-				tree.children = newChildren;
-//				return tree;
+				this.node.setToOr();
+				this.children = newChildren;
 			}
 		} 
-		return tree;
 	}
 	
-	public WishTree developpTree(WishTree tree){ 
-		if (tree.children != null){
-			
-//			System.out.println("*****************before developp node************");
-//			System.out.println(tree);
-			
-			tree = developpNode(tree);
-			
-//			System.out.println("*****************after developp before simplify************");
-//			System.out.println(tree);
-			
-			simplifyTree(tree);
-			
-//			System.out.println("*****************after developp after simplify************");
-//			System.out.println(tree);
-			
-			
-			for (WishTree child : tree.children){
-				
-				developpTree(child);
-				
-			
-			}
-//			developpNode(tree);
-		}
-		
-		simplifyTree(tree);
-		return tree;
-	}
-	
-	public boolean isDevelopped(WishTree tree){
-		
-		
-		
-		return true;
-	}
-
 	//------------------------------------------------------------------------------------------------------------------------------------	
 	
-	public WishTree normaliseTerminalBranches(WishTree developpedTree){ // transforms nr nodes in and nodes with the number. Ex : 1  -> (AND;1)
+	public void normaliseTerminalBranches_old(){ // transforms nr nodes in and nodes with the number. Ex : 1  -> (AND;1)
 		int i = 0;
 		Vector<WishTree> normalisedChildren = new Vector<WishTree>();
-		for (WishTree child : developpedTree.getChildren()){
+//		WishTree leaves = new WishTree(this.getNode().isAND(), this.getNode().isOR()); // TODO : check if this works
+		WishTree leaves = new WishTree(true, false);
+		for (WishTree child : this.getChildren()){
 			if (child.getNode().isNR()){
-				WishTree normChild = new WishTree(true, false);
-				normChild.addChild(child);
-				normalisedChildren.add(normChild);
+//				WishTree normChild = new WishTree(true, false);
+				leaves.addChild(child);
+//				normalisedChildren.add(normChild);
 			} else if (child.getNode().isAND()){
 				normalisedChildren.add(child);
 			} else {
 				System.out.println("you should not see that, normaliseTerminalBranche called with wrong arguments ");
 			}
 		}
-		developpedTree.resetChildren();
-		developpedTree.addChildren(normalisedChildren);
+		if (!(leaves.getChildren() == null || leaves.getChildren().isEmpty())){
+
+			normalisedChildren.add(leaves);
+		}
+		this.resetChildren();
+		this.addChildren(normalisedChildren);
 		
-		return developpedTree;
 	}
+	public void normaliseTerminalBranches(){ // transforms nr nodes in and nodes with the number. Ex : 1  -> (AND;1)
+		
+		if (this.getNode().isAND()){ // should only happen when the whole tree is (AND;leaves)
+			WishTree copy = this.Clone();
+			this.resetChildren();
+			this.node = new Wish(false, true, false, -1);
+			this.addChild(copy);
+		}
+		if (this.getNode().isOR()) {
+			int i = 0;
+			Vector<WishTree> normalisedChildren = new Vector<WishTree>();
+			
+			for (WishTree child : this.getChildren()){
+				if (child.getNode().isNR()){
+					WishTree newChild = new WishTree(true, false);
+					newChild.addChild(child);
+					normalisedChildren.add(newChild);
+				} else if (child.getNode().isAND()){
+					normalisedChildren.add(child);
+				} else {
+					System.out.println("you should not see that, normaliseTerminalBranche called with wrong arguments ");
+				}
+			}
+			
+			this.resetChildren();
+			this.addChildren(normalisedChildren);
+			
+		}
+		
+	}
+	
 	
 	//------------------------------------------------------------------------------------------------------------------------------------	
 	
+	public void removeRedundancy(){ // removes branches that contains other branches. Ex : if there is a branch (AND;1) and a branch (AND;5;2;1) it will remove the latter
+		//there is no need for anyhting that contains a 1 (it will already be calculated)
+		Vector<WishTree> newChildren = new Vector<WishTree>();
+		Vector<WishTree> toRemove = new Vector<WishTree>();
+		
+		for (WishTree childA : this.getChildren()){
+			boolean keepChildA = true;
+			
+			for (WishTree newChild : newChildren){
+				int test = branchContains(childA, newChild);
+				if (test == 0 || test == 2){
+					keepChildA = false;
+				}
+				if (test == 1){
+					toRemove.add(newChild);
+				}
+			}
+			if (!toRemove.isEmpty()){
+				newChildren.removeAll(toRemove);
+			}
+			if (keepChildA){
+				newChildren.add(childA);
+			}
+		}
+		
+		this.resetChildren();
+		this.addChildren(newChildren);
+	}
+
 	public int branchContains(WishTree branchA, WishTree branchB){ // if A in B returns 1; if B in A returns 2, if A=B returns 0, otherwise -1
 		
 		WishTree tempA = new WishTree();
 		WishTree tempB = new WishTree();
+		
 		boolean swiched = false;
 		if (branchA.getChildren().size()<branchB.getChildren().size()){ // this avoids terminating after not finding an element of the bigger set in the sebset.
-			tempA = branchA.Clone(branchA);
-			tempB = branchB.Clone(branchB);
+			tempA = branchA.Clone();
+			tempB = branchB.Clone();
 		} else {
-			tempB = branchA.Clone(branchA);
-			tempA = branchB.Clone(branchB);
+			tempB = branchA.Clone();
+			tempA = branchB.Clone();
 			swiched = true; // this is a bit dirty TODO better if possible
 		}
-//		WishTree tempA = branchA.Clone(branchA);
-//		WishTree tempB = branchB.Clone(branchB);
-		int childRemovedFormB = 0;
 		
+		int childRemovedFormB = 0;
 		boolean childAIsPresent;
 		for (WishTree childA : tempA.getChildren()){
 			childAIsPresent = tempB.removeOneOccurenceOf(childA.getNode().getNr());
@@ -354,39 +368,11 @@ public class WishTree {
 		
 	}
 	
-	public WishTree removeRedundancy(WishTree normalisedTree){
-		Vector<WishTree> newChildren = new Vector<WishTree>();
-		Vector<WishTree> toRemove = new Vector<WishTree>();
-		
-		for (WishTree childA : normalisedTree.getChildren()){
-			boolean keepChildA = true;
-			
-			for (WishTree newChild : newChildren){
-				int test = branchContains(childA, newChild);
-				if (test == 0 || test == 2){
-					keepChildA = false;
-				}
-				if (test == 1){
-					toRemove.add(newChild);
-				}
-			}
-			if (!toRemove.isEmpty()){
-				newChildren.removeAll(toRemove);
-			}
-			if (keepChildA){
-				newChildren.add(childA);
-			}
-		}
-		
-		normalisedTree.resetChildren();
-		normalisedTree.addChildren(newChildren);
-		return normalisedTree;
-	}
-	
-	//------------------------------------------------------------------------------------------------------------------------------------	
-	//------------------------------------------------------------------------------------------------------------------------------------	
-	
 
+	
+	//------------------------------------------------------------------------------------------------------------------------------------	
+	//------------------------------------------------------------------------------------------------------------------------------------	
+	
 	public String nodeToString(WishTree tree, int depth){
 		String res = "";
 		for (int i = 0; i <= depth; i++){
@@ -394,7 +380,6 @@ public class WishTree {
 		}
 		res += tree.node.toString();
 		res += "\n";
-//		System.out.println(res);
 		return res;
 	}
 
@@ -405,15 +390,12 @@ public class WishTree {
 	}
 
 	public String toString (WishTree tree, int depth, String res){
-		
 		res += tree.nodeToString(tree, depth);
-		
 		if (tree.children != null){
 			for (WishTree child : tree.children){
 				res = toString(child, depth + 1 , res);
 			}
 		}
-		
 		return res;
 	}
 
@@ -427,16 +409,27 @@ public class WishTree {
 		return children;
 	}
 
+	public Vector<WishTree> getChildren(boolean AND, boolean OR, boolean NR){
+		Vector<WishTree> res = new Vector<WishTree>();
+		if (!(this.children == null)){
+			for (WishTree child : this.children){
+				if ( (AND && child.node.isAND()) || (OR && child.node.isOR()) || (NR && child.node.isNR())) {
+					res.add(child);
+				}
+			}
+		}
+		return res;
+	}
+	
 	public void addChild(WishTree tree) {
 		this.children.add(tree);
-		tree.parent = this;
-		
+//		tree.parent = this;
 	}
 
 	public void addChildren(List<WishTree> children2) {
 		this.children.addAll(children2);
 		for (WishTree child : children2){
-			child.parent = this;
+//			child.parent = this;
 		}
 		
 	}
@@ -465,9 +458,8 @@ public class WishTree {
 		
 	}
 
-	
 	public void SetParent(WishTree parent){
-		this.parent = parent;
+//		this.parent = parent;
 		parent.children.add(this);
 	}
 
@@ -480,16 +472,5 @@ public class WishTree {
 		return false;
 	}
 	
-	public Vector<WishTree> getChildren(boolean AND, boolean OR, boolean NR){
-		Vector<WishTree> res = new Vector<WishTree>();
-		if (!(this.children == null)){
-			for (WishTree child : this.children){
-				if ( (AND && child.node.isAND()) || (OR && child.node.isOR()) || (NR && child.node.isNR())) {
-					res.add(child);
-				}
-			}
-		}
-		return res;
-	}
 	
 }
