@@ -194,7 +194,7 @@ public class WishTree {
 	//------------------------------------------------------------------------------------------------------------------------------------	
 	
 	public void developpTree(){ 		// developps the remaining parenthesis  Ex : (A or B) and C becomes (A and C) OR (B and C)
-		if (this.children != null){
+		if (this.children != null){		// TODO check if all trees have an OR root after that
 			
 			this.developpNode();
 			this.simplifyTree();
@@ -237,9 +237,10 @@ public class WishTree {
 	
 	//------------------------------------------------------------------------------------------------------------------------------------	
 	
-	public void normaliseTerminalBranches(){ // transforms nr nodes in and nodes with the number. Ex : 1  -> (AND;1)
+	public void normaliseTerminalBranches_old(){ // transforms nr nodes in and nodes with the number. Ex : 1  -> (AND;1)
 		int i = 0;
 		Vector<WishTree> normalisedChildren = new Vector<WishTree>();
+//		WishTree leaves = new WishTree(this.getNode().isAND(), this.getNode().isOR()); // TODO : check if this works
 		WishTree leaves = new WishTree(true, false);
 		for (WishTree child : this.getChildren()){
 			if (child.getNode().isNR()){
@@ -260,6 +261,37 @@ public class WishTree {
 		this.addChildren(normalisedChildren);
 		
 	}
+	public void normaliseTerminalBranches(){ // transforms nr nodes in and nodes with the number. Ex : 1  -> (AND;1)
+		
+		if (this.getNode().isAND()){ // should only happen when the whole tree is (AND;leaves)
+			WishTree copy = this.Clone();
+			this.resetChildren();
+			this.node = new Wish(false, true, false, -1);
+			this.addChild(copy);
+		}
+		if (this.getNode().isOR()) {
+			int i = 0;
+			Vector<WishTree> normalisedChildren = new Vector<WishTree>();
+			
+			for (WishTree child : this.getChildren()){
+				if (child.getNode().isNR()){
+					WishTree newChild = new WishTree(true, false);
+					newChild.addChild(child);
+					normalisedChildren.add(newChild);
+				} else if (child.getNode().isAND()){
+					normalisedChildren.add(child);
+				} else {
+					System.out.println("you should not see that, normaliseTerminalBranche called with wrong arguments ");
+				}
+			}
+			
+			this.resetChildren();
+			this.addChildren(normalisedChildren);
+			
+		}
+		
+	}
+	
 	
 	//------------------------------------------------------------------------------------------------------------------------------------	
 	

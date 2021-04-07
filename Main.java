@@ -25,14 +25,16 @@ public class Main {
 //		String str = "(OR;(AND;" + PAIR + ";" + PAIR + ";" + PAIR + ";(OR;1;5);" + TRIPLE + ";(AND;(OR;" + TRIPLE + ";" + TRIPLE + "))))";
 		String str = "(OR;" +
 //				"(OR;1;5);" +
-//				"(AND;1;1;1)" + 
+//				"1" +
+//				"(AND;1;1;1;1)" + 
 				"(AND;1;2;3;4;5;6);" +
 //				"(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6));" +
 //				"(AND;(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6));(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6)));" +
 //				"(AND;(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6)))" +
 				")";
+//		str = "(AND;(AND;(AND;(AND;6;6);5);3;5);1)";
 		
-//		String str = "(OR;" +
+//		str = "(OR;" +
 //				"(AND;2;3;4;5;6);" +
 //				"(AND;1;3;4;5;6);" +
 //				"(AND;1;2;4;5;6);" +
@@ -48,11 +50,11 @@ public class Main {
 //		
 		
 		
-		String str1 = 
-				"(AND;1;1;1)"
-//				"(AND;1)"
-//				"(AND;(OR;(AND;(OR;3;5);1);(AND;2;5));(OR;(AND;3;2);1))"
-				;
+//		String str1 = 
+//				"(AND;1;1;1)"
+////				"(AND;1)"
+////				"(AND;(OR;(AND;(OR;3;5);1);(AND;2;5));(OR;(AND;3;2);1))"
+//				;
 
 		
 		
@@ -67,7 +69,7 @@ public class Main {
 //		System.out.println("the proba rec is " + (double) testThrow.probaCompleteRec(test)/Math.pow(nrFaces, nrDice));
 		System.out.println("the proba rec is " + res);
 		System.out.println("-----------------------------------------------------------------------------");
-		System.out.println("the proba is " +  (double) testThrow.ProbaComplete(test)/Math.pow(nrFaces, nrDice));//
+//		System.out.println("the proba is " +  (double) testThrow.ProbaComplete(test)/Math.pow(nrFaces, nrDice));//
 		
 //		WishTree test1 = WishTree.importAndPrepareTree(str1, true);
 //		Throw testThrow1 = new Throw(test1, nrDice, nrFaces);
