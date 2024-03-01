@@ -47,7 +47,7 @@ public class WishTest {
 
 	private double computeProbability(int nrFaces, int nrDice, String encodingString)
 			throws AssertionError {
-		WishTree toCompute = WishTree.importAndPrepareTree(encodingString, true);
+		WishTree toCompute = WishTree.importAndPrepareTree(encodingString, nrFaces, nrDice, true);
 		if (toCompute == null) {
 			throw new AssertionError("input tree could not be interpretated or is null.");
 		} 

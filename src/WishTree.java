@@ -49,13 +49,12 @@ public class WishTree {
 	
 	// ------------------------------------------------------------------------------------------------------------------------------------
 	
-	public static WishTree importAndPrepareTree(String encodingString,
-			boolean verbose) {
+	public static WishTree importAndPrepareTree(String encodingString, int nrFaces, int nrDice,	boolean verbose) {
 		String firstTestResult = firstTest(encodingString); 
 		if (firstTestResult == ""){
 			return null;
 		}
-		WishTree tree = WishTree.validStringToTree(firstTestResult);
+		WishTree tree = WishTree.validStringToTree(firstTestResult, nrFaces, nrDice);
 		if (tree==null){
 			return null;
 		}
@@ -134,21 +133,74 @@ public class WishTree {
 		
 		return res;
 	}
+	
+	
+	private static WishTree presetStringToTree(String preset, int nrFaces, int nrDice){
+		preset.toLowerCase();
+		
+		
+		switch (preset){
+		case "pair":
+			return pair(nrFaces);
+		case "tenthousand":
+			return zehnTausend();
+		case "street":
+			return incompleteStreet(nrFaces, nrDice);
+			
+		} 
+		
+		String tupelcheck = preset.substring(0, 6);
+		if (tupelcheck.equalsIgnoreCase("ntupel")){
+			int tupelSize;
+			try{
+				tupelSize = Integer.parseInt(preset.substring(6));
+				return nTupel(nrFaces, tupelSize); 
+			} catch  (final NumberFormatException e){
+				System.out.println("imput error : ntupel string should be for instance ntupel3, this yould be a triple ");
+				return null;
+			}
+			
+		}
+		
+		return null;
+	}
 
-	public static WishTree validStringToTree(String encodingString) {
+	private static WishTree handleImputLeaf(String encodingString, int nrFaces, int nrDice){
+		int res;
+		try {
+			res = Integer.parseInt(encodingString);
+			return new WishTree(res); // TODO the child still have no parent
+		} catch (final NumberFormatException e){
+			
+			WishTree resTree = presetStringToTree(encodingString, nrFaces, nrDice);
+			if (resTree != null){
+				return resTree;
+			}else {
+				System.out.println("this leaf (" + encodingString + ") is not an integer or a valid preset. removed.");
+				return null;
+			}
+			
+			
+		}
+	}
+	
+	public static WishTree validStringToTree(String encodingString, int nrFaces, int nrDice) {
 		
 		int i = 0;
 		if (!(encodingString.charAt(i) == '(')) { // if it doesn't start with a
 													// parenthesis, it must be a
-													// number
-			int res;
-			try {
-				res = Integer.parseInt(encodingString);
-				return new WishTree(res); // TODO the child still have no parent
-			} catch (final NumberFormatException e){
-				System.out.println("this leaf (" + encodingString + ") is not an integer. removed.");
-				return null;
-			}
+													// number or a preset
+			
+			WishTree resTree = handleImputLeaf(encodingString, nrFaces, nrDice);
+			return resTree;
+//			int res;
+//			try {
+//				res = Integer.parseInt(encodingString);
+//				return new WishTree(res); // TODO the child still have no parent
+//			} catch (final NumberFormatException e){
+//				System.out.println("this leaf (" + encodingString + ") is not an integer. removed.");
+//				return null;
+//			}
 
 		} else {
 			i++;
@@ -205,7 +257,7 @@ public class WishTree {
 				for (String childString : childStrings) {
 					if (childString != null) {
 
-						newTree.addChild(validStringToTree(childString));
+						newTree.addChild(validStringToTree(childString, nrFaces, nrDice));
 					}
 				}
 			}
@@ -786,6 +838,8 @@ public class WishTree {
 		return newTree;
 	}
 	
+	
+	
 	public static WishTree fastStrasseOrStrasse(int nrFaces){
 		WishTree result = new WishTree(false, true);
 		
@@ -802,7 +856,7 @@ public class WishTree {
 		return result;
 	}
 	
-	public static WishTree smallStreet(int nrFaces, int streetSize){
+	public static WishTree incompleteStreet(int nrFaces, int streetSize){
 		WishTree newTree = new WishTree(false, true);
 		int freeDice = nrFaces-streetSize;
 		

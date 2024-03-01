@@ -459,10 +459,12 @@ public class Gui extends JFrame{
 	
 	protected void importUserString(String string) {
 		try {
+			int nrFaces = this.getNrFaces();
+			int nrDice = this.getNrDice();
 //			this.currentTree = WishTree.stringToTree(string); //string -> tree -> displaytree. not efficient. currentTree only calculated on calculate
 			
 //			this.displayTree = new JTree(this.currentTreeToDisplay (currentTree));
-			WishTree transitionTree = WishTree.importAndPrepareTree(string, true);
+			WishTree transitionTree = WishTree.importAndPrepareTree(string, nrFaces, nrDice, true);
 			DefaultMutableTreeNode root = wishTreeToDisplay(transitionTree);
 			
 //			DefaultMutableTreeNode root = stringToDisplayTreeNoLink(string);
@@ -638,6 +640,26 @@ public class Gui extends JFrame{
 		tree.expandPath(path);
 	}
 
+	public int getNrFaces(){
+		int res;
+		try {
+			res = Integer.parseInt(this.nrFacesTextfield.getText());
+			return res;
+		} catch (final NumberFormatException e){
+			return 0;
+		}
+	}
+	
+	public int getNrDice(){
+		int res;
+		try {
+			res = Integer.parseInt(this.nrDiceTextField.getText());
+			return res;
+		} catch (final NumberFormatException e){
+			return 0;
+		}
+	}
+	
 	// ------------------------------------------------------------------------------------------------------------------------------------
 	
 	

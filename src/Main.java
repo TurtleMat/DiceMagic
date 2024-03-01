@@ -14,7 +14,7 @@ public class Main {
 	private static void computation(){
 		
 		int nrFaces = 6;
-		int nrDice = 2;
+		int nrDice = 6;
 		
 		
 //		WishTree toCompute = WishTree.Street(nrFaces);
@@ -27,12 +27,12 @@ public class Main {
 //		String encodingString = "(AND;(OR;(AND;1;1;1);SDGWe;rg;(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6));(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6)))";
 //		String encodingString = "SDGWe;rg";
 //		String encodingString = "(OR;(OR;1;5);(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6))";
-		String encodingString = "(OR;(AND;1;5);(AND;1;1);(AND;5;5))";
+		String encodingString = "(OR;tenthousand)";
 
 //		WishTree toCompute = WishTree.zehnTausend();
 		
 		
-		WishTree toCompute = WishTree.importAndPrepareTree(encodingString, true);
+		WishTree toCompute = WishTree.importAndPrepareTree(encodingString, nrFaces, nrDice, true);
 		if (toCompute == null){
 			System.out.println("imput tree could not be interpretated or is null.");
 		}else {

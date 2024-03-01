@@ -102,11 +102,12 @@ public class Throw { // this is wrong !!
 			double toAdd = (probaBranchOpitForRepetitions(currGoal))
 					* Math.pow((-1), intersecSize + 1);
 			res += toAdd;
+			
+			System.out.println("Adding " + (double) toAdd
+					/ Math.pow(this.nrFaces, this.nrDice) + " to the proba ("
+					+ toAdd + " favourable cases)");
+			System.out.println(goalToString(currGoal));
 
-			// System.out.println("Adding " +
-			// (double)toAdd/Math.pow(this.nrFaces, this.nrDice) +
-			// " to the proba (" + toAdd + " favourable cases)");
-			// System.out.println(goalToString(currGoal));
 
 			return res;
 		}
