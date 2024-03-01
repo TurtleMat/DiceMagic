@@ -1,0 +1,5 @@
+Questions : 
+- easy was to include Wish in Wishtree so that I can remove the Wish class, without having to change code manually?  (refactor?)
+- when is == safe? 
+- popup meu only for nodes in the tree how to?
+- 
