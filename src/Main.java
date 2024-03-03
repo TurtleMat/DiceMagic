@@ -14,7 +14,7 @@ public class Main {
 	private static void computation(){
 		
 		int nrFaces = 6;
-		int nrDice = 6;
+		int nrDice = 7;
 		
 		
 //		WishTree toCompute = WishTree.Street(nrFaces);
@@ -24,10 +24,12 @@ public class Main {
 		
 //		WishTree toCompute = WishTree.nTupel(nrFaces, 6, new int[] {1, 5});
 		
-//		String encodingString = "(AND;(OR;(AND;1;1;1);SDGWe;rg;(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6));(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6)))";
+//		String encodingString = "(AND;(OR;(AND;1;1;1);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6));(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6)))";
 //		String encodingString = "SDGWe;rg";
 //		String encodingString = "(OR;(OR;1;5);(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6))";
-		String encodingString = "(OR;tenthousand)";
+//		String encodingString = "(AND;ntupel5;tenthousand)";
+//		String encodingString = "(AND;1;2;(OR;3;(AND;4;5)))";
+		String encodingString = "(AND;(OR;3;5);2;(OR;1;4))";
 
 //		WishTree toCompute = WishTree.zehnTausend();
 		
@@ -37,7 +39,7 @@ public class Main {
 			System.out.println("imput tree could not be interpretated or is null.");
 		}else {
 			
-			WishTree.prepareTree(toCompute, true);
+			WishTree.prepareTree(toCompute, true, nrDice);
 			Throw toThrow = new Throw(toCompute, nrDice, nrFaces);
 			
 			double res = toThrow.probaCompleteRec(toCompute)/ Math.pow(nrFaces, nrDice);
@@ -56,9 +58,10 @@ public class Main {
 		
 
 		int nrFaces = 6;
+		int nrDice = 6;
 		WishTree testTree = WishTree.zehnTausend();
 		System.out.println(testTree.toString());
-		WishTree.prepareTree(testTree, true);
+		WishTree.prepareTree(testTree, true, nrDice);
 		
 //		System.out.println(WishTree.andCopy(WishTree.nTupel(nrFaces, 2),3).toString());
 		

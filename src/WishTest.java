@@ -52,7 +52,7 @@ public class WishTest {
 			throw new AssertionError("input tree could not be interpretated or is null.");
 		} 
 
-		WishTree.prepareTree(toCompute, true);
+		WishTree.prepareTree(toCompute, true, nrDice);
 		Throw toThrow = new Throw(toCompute, nrDice, nrFaces);
 
 		double res = toThrow.probaCompleteRec(toCompute) / Math.pow(nrFaces, nrDice);

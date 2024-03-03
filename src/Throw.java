@@ -12,10 +12,21 @@ public class Throw { // this is wrong !!
 	private long[] factoriels;
 	private Vector<StackWithProba> stacksWithProbas;
 
+//	public static Vector<String> availablePresets = new Vector<String>("pair", "ntupel", "street", "partialstreet", "tenthousand"); 
+	
+	
+//	this.availablePresets =  {"pair", "ntupel", "street", "partialstreet", "tenthousand"};
+	
 	public Throw(WishTree tree, int nrDice, int nrFaces) {
 		this.nrDice = nrDice;
 		this.nrFaces = nrFaces;
 		this.wish = tree;
+		
+//		this.availablePresets.add("pair");
+//		this.availablePresets.add("ntupel");
+//		this.availablePresets.add("street");
+//		this.availablePresets.add("partialstreet");
+//		this.availablePresets.add("tenthousand");
 
 		this.stacksWithProbas = new Vector<StackWithProba>();
 
@@ -42,7 +53,7 @@ public class Throw { // this is wrong !!
 		if (verbose) {
 			System.out.println("starting to compute");
 		}
-		removeBigChildren(tree);
+//		removeBigChildren(tree);
 		removeBigValues(tree);
 		if (verbose){
 			System.out.println("new tree :");
@@ -168,7 +179,7 @@ public class Throw { // this is wrong !!
 		if (verbose) {
 			System.out.println("starting to compute");
 		}
-		removeBigChildren(tree);
+//		removeBigChildren(tree);
 		removeBigValues(tree);
 
 		// float res = 0;
@@ -343,40 +354,59 @@ public class Throw { // this is wrong !!
 
 	}
 
-	private void removeBigChildren(WishTree developpedNormalisedTree) { 
-		Vector<WishTree> toRemove = new Vector<WishTree>();// supresses children
-															// that have more
-															// numbers than
-															// this.nrDice
-		for (WishTree child : developpedNormalisedTree.getChildren()) {
-			if (developpedNormalisedTree.getNode().isAND() && child.getChildren().size() > this.nrDice) {
-				toRemove.add(child);
-			}
-		}
-		developpedNormalisedTree.getChildren().removeAll(toRemove);
-
-		if (toRemove.size() > 0) {
-			System.out
-					.println("removed AND children that were too big. new tree : ");
-			System.out.println(developpedNormalisedTree.toString());
-		}
-
-	}
+//	private void removeBigChildren(WishTree developpedNormalisedTree) { 
+//		Vector<WishTree> toRemove = new Vector<WishTree>();// supresses children
+//															// that have more
+//															// numbers than
+//															// this.nrDice
+//		for (WishTree child : developpedNormalisedTree.getChildren()) {
+//			if (developpedNormalisedTree.isAND() && child.getChildren().size() > this.nrDice) {
+//				toRemove.add(child);
+//			}
+//		}
+//		developpedNormalisedTree.getChildren().removeAll(toRemove);
+//
+//		if (toRemove.size() > 0) {
+//			System.out
+//					.println("removed AND children that were too big. new tree : ");
+//			System.out.println(developpedNormalisedTree.toString());
+//		}
+//
+//	}
 	
 	
 	private void removeBigValues(WishTree developpedNormalisedTree){ 
 		Vector<WishTree> toRemove = new Vector<WishTree>();
 		
-		Vector<WishTree> operatorChildren = developpedNormalisedTree.getChildren(true, true, false);
+		Vector<WishTree> andChildren = developpedNormalisedTree.getChildren(true, false, false);
+		Vector<WishTree> orChildren = developpedNormalisedTree.getChildren(false, true, false);
 		Vector<WishTree> numberChildren = developpedNormalisedTree.getChildren(false, false, true);
 		
 		for (WishTree child : numberChildren){
-			if (child.getNode().getNr() > this.nrFaces){
+			if (child.getNr() > this.nrFaces){
 				toRemove.add(child);
 			}
 		}
-		for (WishTree child : operatorChildren){
-			removeBigValues(child);
+		for (WishTree child : andChildren){
+			boolean removeChild = false;
+			for (WishTree grandchild : child.getChildren()){
+				if (grandchild.getNr()>this.nrFaces && !removeChild){
+					toRemove.add(child);
+					removeChild = true;
+				}
+			}
+		}
+		
+		for (WishTree child : orChildren){
+			Vector<WishTree> toRemoveFromOr = new Vector<WishTree>();
+			for (WishTree grandChild : child.getChildren()){
+				if (grandChild.getNr()>this.nrFaces){
+					toRemoveFromOr.add(grandChild);
+				}
+			}
+			for (WishTree grandChildToRemove : toRemoveFromOr){
+				child.getChildren().remove(grandChildToRemove);
+			}
 		}
 		
 		for (WishTree child : toRemove){
@@ -582,7 +612,7 @@ public class Throw { // this is wrong !!
 	private int occurencesOf(int i, WishTree lastBranch) {
 		int res = 0;
 		for (WishTree child : lastBranch.getChildren()) {
-			if (child.getNode().getNr() == i) {
+			if (child.getNr() == i) {
 				res++;
 			}
 		}
@@ -634,4 +664,5 @@ public class Throw { // this is wrong !!
 		return res;
 	}
 
+	
 }

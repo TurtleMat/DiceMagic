@@ -2,6 +2,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,7 +21,7 @@ import javax.swing.tree.TreePath;
 
 public class Gui extends JFrame{
 	JFrame mainFrame = new JFrame("Dice Magic");  
-//	ActionListener popupMenuActionListener;
+
 	
 	JLabel nrDiceLabel = new JLabel("number of dice");
 	JTextField nrDiceTextField = new JTextField();
@@ -35,30 +36,23 @@ public class Gui extends JFrame{
 	WishTree currentTree;
 	JLabel currentTreeLabel = new JLabel("current Wish :");
 	
-//	JTextArea currentTreeDisplay = new JTextArea();
-//	DefaultMutableTreeNode currentTreeForDisplay = new DefaultMutableTreeNode();
 	
 	JTree displayTree = new JTree();
 	JScrollPane scrollPanel =new JScrollPane();
 	JPopupMenu popup = new JPopupMenu();
 	
-	Wish currentNode;
-
-//	
 	JButton clearTree = new JButton("clear");
 	JButton calculate = new JButton("Calculate");
 	JButton close = new JButton("Close");
 
 	JLabel resultLabel = new JLabel("The probability is : ");
 	JLabel result = new JLabel("here is the output text");
-//	Label diverseOutput = new Label();
+
 
 	
-	
 	JPopupMenu nodeEditMenu;
-	JMenu addChildMenu, changeToMenu, removeChildMenu;
+	JMenu addChildMenu, changeToMenu;
 	JMenuItem remove;
-//	JMenuItem menuItem;
 	ActionListener popupMenuAddActionListener = new ActionListener() {
 		
 		public void actionPerformed(ActionEvent arg0) {
@@ -82,6 +76,7 @@ public class Gui extends JFrame{
 	public Gui(){
 		this.mainFrame.setSize(1200, 2000);
 		this.mainFrame.setLayout(null);
+		this.mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		
 		setBounds();
@@ -109,51 +104,62 @@ public class Gui extends JFrame{
 	
 	// ------------------------------------------------------------------------------------------------------------------------------------
 
-
+	private void setupContextMenuElements(String label, JMenu addMenu, JMenu changeMenu){
+		JMenuItem tmp;
+		
+		tmp = new JMenuItem(label);
+		addMenu.add(tmp);
+		tmp.addActionListener(popupMenuAddActionListener);
+		
+		tmp = new JMenuItem(label);
+		changeMenu.add(tmp);
+		tmp.addActionListener(popupMenuChangeActionListener);		
+	}
 	
 	private void createContextMenu(){
 
-				
-//		nodeEditMenu = new JPopupMenu();
 		nodeEditMenu = this.popup;
-		this.displayTree.setComponentPopupMenu(popup); // TODO 
-
-		
-		addChildMenu = new JMenu("Add a child:");
-		nodeEditMenu.add(addChildMenu);
+		this.displayTree.setComponentPopupMenu(popup);
 		
 		remove = new JMenuItem("remove");
 		nodeEditMenu.add(remove);
 		
+		addChildMenu = new JMenu("Add a child:");
+		nodeEditMenu.add(addChildMenu);
+
 		changeToMenu = new JMenu("change to :");
 		nodeEditMenu.add(changeToMenu);
 		
-		int nrFaces = Integer.parseInt(this.nrFacesTextfield.getText());//todo user imput handling
+		int nrFaces = Integer.parseInt(this.nrFacesTextfield.getText());
+
+		setupContextMenuElements("AND",addChildMenu, changeToMenu);
+		setupContextMenuElements("OR",addChildMenu, changeToMenu);
 		
-		JMenuItem[] possibleChildrenToAdd = new JMenuItem[nrFaces+5];
-		JMenuItem[] possibleChildrenToChange = new JMenuItem[nrFaces+5];
-		possibleChildrenToAdd[0] = new JMenuItem("AND");
-		possibleChildrenToAdd[1] = new JMenuItem("OR");
-		possibleChildrenToChange[0] = new JMenuItem("AND");
-		possibleChildrenToChange[1] = new JMenuItem("OR");
 		for (int i = 0; i<nrFaces;i++){
-			possibleChildrenToAdd[i+2] = new JMenuItem(""+(i+1));
-			possibleChildrenToChange[i+2] =new JMenuItem(""+(i+1));
+			setupContextMenuElements(""+(i+1),addChildMenu, changeToMenu);
 		}
 		
-		int i = 0;
-		while (possibleChildrenToAdd[i] != null){
-			possibleChildrenToAdd[i].addActionListener(popupMenuAddActionListener);
-			possibleChildrenToChange[i].addActionListener(popupMenuChangeActionListener);
-			i++;
+		int l = 0;
+		while (l<WishTree.getAvailablePresets().length){
+			String currPreset = WishTree.getAvailablePresets()[l];
+			
+			if (currPreset.equalsIgnoreCase("ntupel")){
+				
+				JMenu ntupelAdd = new JMenu("ntupel");
+				JMenu ntupelChange = new JMenu("ntupel");
+				addChildMenu.add(ntupelAdd);
+				changeToMenu.add(ntupelChange);				
+				
+				int i = 3;
+				while (i<= this.getNrDice()){
+					setupContextMenuElements("ntupel"+(i), ntupelAdd,ntupelChange );
+					i++;
+				}
+			} else {
+				setupContextMenuElements(currPreset, addChildMenu, changeToMenu);
+			}
+			l++;
 		}
-		
-		
-		for (int k = 0; k<nrFaces+2;k++){
-			addChildMenu.add(possibleChildrenToAdd[k]);
-			changeToMenu.add(possibleChildrenToChange[k]);
-		}
-		
 	}
 
 	private void initialise() {
@@ -240,22 +246,7 @@ public class Gui extends JFrame{
 				labelHeight*2+margin*3+shiftDown, 
 				labelWidth, 
 				labelHeight);
-//		this.lineDown.setBounds(margin*2+labelWidth,
-//				labelHeight*2+margin*3+shiftDown, 
-//				labelWidth, 
-//				labelHeight); 
-//		this.lineUp.setBounds(margin*3+labelWidth*2,
-//				labelHeight*2+margin*3+shiftDown,
-//				labelWidth, 
-//				labelHeight);
-//		this.modify.setBounds(margin*4+labelWidth*3, 
-//				labelHeight*2+margin*3+shiftDown, 
-//				labelWidth, 
-//				labelHeight);
-//		this.clearTree.setBounds(margin*5+labelWidth*4, 
-//				labelHeight*2+margin*3+shiftDown,  
-//				labelWidth,
-//				labelHeight);
+
 		
 		this.clearTree.setBounds(margin*2+labelWidth,
 				labelHeight*2+margin*3+shiftDown, 
@@ -266,27 +257,7 @@ public class Gui extends JFrame{
 				labelHeight*3+margin*4+shiftDown, 
 				labelWidth*3, 
 				600);
-//		this.toOR.setBounds(margin*2+labelWidth*3, 
-//				labelHeight*3+margin*4+shiftDown, 
-//				labelWidth, 
-//				labelHeight);
-//		this.toAND.setBounds(margin*2+labelWidth*3, 
-//				labelHeight*4+margin*5+shiftDown, 
-//				labelWidth, 
-//				labelHeight);
-//		this.toNr.setBounds(margin*2+labelWidth*3, 
-//				labelHeight*5+margin*6+shiftDown, 
-//				labelWidth, 
-//				labelHeight);
-//		this.addChild.setBounds(margin*2+labelWidth*3, 
-//				labelHeight*6+margin*7+shiftDown, 
-//				labelWidth, 
-//				labelHeight);
-//		this.newNumberTextField.setBounds(margin*3+labelWidth*4, 
-//				labelHeight*5+margin*6+shiftDown, 
-//				labelWidth, 
-//				labelHeight);
-		
+
 		this.calculate.setBounds(margin, 
 				600+labelHeight*3+margin*5+shiftDown, 
 				labelWidth, 
@@ -309,7 +280,6 @@ public class Gui extends JFrame{
 
 	private void setupActionListeners() {
 		
-		
 
 		close.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -323,37 +293,7 @@ public class Gui extends JFrame{
 				
 			}
 		});
-//		
-//		toAND.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				changeNodeToAND();
-//			}
-//
-//			
-//		});
-//		
-//		toOR.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				changeNodeToOR();
-//			}
-//			
-//		});
-//		
-//		toNr.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				changeNodeToNr(newNumberTextField.getText());
-//			}
-//			
-//		});
-//		
-//		addChild.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				addChild(newNumberTextField.getText());
-//			}
-//
-//			
-//		});
-//		
+
 
 		clearTree.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -368,19 +308,7 @@ public class Gui extends JFrame{
 
 		});
 		
-//		displayTree.addMouseListener(new MouseAdapter() {
-//	        @Override
-//	        public void mousePressed(MouseEvent mouseEvent)
-//	        {
-////	            handleContextMenu(mouseEvent);
-//	        }
-//	        @Override
-//	        public void mouseReleased(MouseEvent mouseEvent)
-//	        {
-////	            handleContextMenu(mouseEvent);
-//	        }
-//		});
-		
+
 		
 		addChildMenu.addActionListener(new ActionListener() {
 			
@@ -393,42 +321,16 @@ public class Gui extends JFrame{
 		remove.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
-				if (node != null){
-					node.removeFromParent();
-					redrawTree();
-				}else{
-					result.setText("please select a node before right clicking");
-				}
 				
+				removeNode();
 				
 			}
 		});	
 		
+		
+		
 	}
 
-//
-//
-//	protected void handleContextMenu(MouseEvent mouseEvent) {
-//
-//		if (displayTree!= null){
-//			if (mouseEvent.getButton() == 3 ){
-//				this.result.setText("this was a right clic I think");
-//				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
-//				if (selectedNode != null){
-//					popup.show(mouseEvent.getComponent(), mouseEvent.getX(), mouseEvent.getY());
-//				}
-//			}
-////			if (mouseEvent.getButton() == 1 ){
-////				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
-////				this.result.setText(mouseEvent.getComponent().getName());
-////				
-////			}
-//		}
-//	}
-//	
-
-	
 	// ------------------------------------------------------------------------------------------------------------------------------------
 
 	
@@ -440,8 +342,22 @@ public class Gui extends JFrame{
 //		KIDZ, DON'T COMPARE STRINGS WITH ==    !!!!!!!
 //		
 		String nodeString =  node.getUserObject().toString();
-
-		WishTree res = new WishTree(Wish.wishFromString(nodeString));
+		WishTree res;
+		boolean isAPreset = false;
+		
+		for (String preset : WishTree.getAvailablePresets()){
+			if (preset.equalsIgnoreCase(nodeString)){
+				isAPreset = true;
+			}
+		}
+		if (nodeString.contains("ntupel")){
+			isAPreset=true;
+		}
+		if (isAPreset){
+			res = WishTree.presetStringToTree(nodeString, this.getNrFaces(), this.getNrDice());
+		} else {
+			res = new WishTree(nodeString);
+		}
 		
 		
 		int nrChildren = node.getChildCount();
@@ -461,36 +377,32 @@ public class Gui extends JFrame{
 		try {
 			int nrFaces = this.getNrFaces();
 			int nrDice = this.getNrDice();
-//			this.currentTree = WishTree.stringToTree(string); //string -> tree -> displaytree. not efficient. currentTree only calculated on calculate
 			
-//			this.displayTree = new JTree(this.currentTreeToDisplay (currentTree));
 			WishTree transitionTree = WishTree.importAndPrepareTree(string, nrFaces, nrDice, true);
 			DefaultMutableTreeNode root = wishTreeToDisplay(transitionTree);
 			
-//			DefaultMutableTreeNode root = stringToDisplayTreeNoLink(string);
 			this.displayTree = new JTree(root) ;
 			
 			this.displayTree.setEditable(true);
 			scrollPanel.setViewportView(this.displayTree);
 			this.expandDisplayTree(displayTree);
 			this.displayTree.setComponentPopupMenu(popup);
+			TreePath rootPath = new TreePath(root.getPath());
+			this.displayTree.setSelectionPath(rootPath);
 			
 			
 //			updateDisplayTreeListener(); //TODO uncomment if sed
-
-			
 //			scrollPanel.setViewportView(this.currentTree);
 			
 		} catch (Exception e){
 			this.currentTree = null;
-//			this.currentTreeForDisplay = null;
 			this.result.setText("Input string invalid!");
 		}
 
 	}
 	
 	private DefaultMutableTreeNode wishTreeToDisplay(WishTree tree) {
-		DefaultMutableTreeNode currentNode = new DefaultMutableTreeNode(tree.getNode().toString());
+		DefaultMutableTreeNode currentNode = new DefaultMutableTreeNode(tree.nodeValueToString());
 		
 		if (tree.getChildren() != null){
 			for (WishTree child : tree.getChildren()){
@@ -504,6 +416,20 @@ public class Gui extends JFrame{
 	// ------------------------------------------------------------------------------------------------------------------------------------
 
 
+	private void removeNode(){
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
+		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+		if (node != null && parent != null){
+			node.removeFromParent();
+			redrawTree();
+			TreePath path = new TreePath(parent.getPath());
+			this.displayTree.setSelectionPath(path);
+			this.importStringTextField.setText("");
+			
+		}else{
+			result.setText("please select a node before right clicking");
+		}
+	}
 	
 	private void changeNodeTo(String text){
 		if (isValidNode(text)){
@@ -516,6 +442,9 @@ public class Gui extends JFrame{
 			node.setUserObject(text);
 			
 			redrawTree();
+			TreePath path = new TreePath(node.getPath());
+			this.displayTree.setSelectionPath(path);
+			this.importStringTextField.setText("");
 		}
 	}
 
@@ -524,8 +453,12 @@ public class Gui extends JFrame{
 		if (node != null){
 			if (Gui.isValidNode(target)){
 				if (( (String) node.getUserObject()).equalsIgnoreCase("OR") || (((String) node.getUserObject()).equalsIgnoreCase("AND") )) { 
-					node.add(new DefaultMutableTreeNode(target));
+					DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(target);
+					node.add(newNode);
 					redrawTree();
+					TreePath path = new TreePath(newNode.getPath());
+					this.displayTree.setSelectionPath(path);
+					this.importStringTextField.setText("");
 				}
 			}
 		}else{
@@ -543,15 +476,6 @@ public class Gui extends JFrame{
 		scrollPanel.setViewportView(displayTree);
 	}
 	
-	protected void modifyLine() {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
-		
-	}
-
-	protected void lineDown() {
-
-	}
-
 	protected void calculateUserProba() {
 		
 		if (this.displayTree == null){
@@ -560,7 +484,6 @@ public class Gui extends JFrame{
 		}
 
 		currentTree = importDisplayedTree((DefaultMutableTreeNode) this.displayTree.getModel().getRoot());
-//		currentTree = importDisplayedTree( this.displayTree);
 		
 		System.out.println(currentTree);
 		
@@ -589,7 +512,7 @@ public class Gui extends JFrame{
 		
 		
 		
-		WishTree tree = WishTree.prepareTree(currentTree, true);
+		WishTree tree = WishTree.prepareTree(currentTree, true, nrDice);
 		if (currentTree != null){
 
 			Throw currentThrow = new Throw(tree, nrDice, nrFaces); // TODO seems to be a pb if a goal contains a number  bigger than nrfaces
@@ -606,7 +529,15 @@ public class Gui extends JFrame{
 
 
 	private static boolean isValidNode(String target){
-		boolean res;
+//		boolean res = false;
+		if (target.contains("ntupel")){
+			return true;
+		}
+		for (String preset : WishTree.getAvailablePresets()){
+			if (target.equalsIgnoreCase(preset)){
+				return true;
+			}
+		}
 		if (target.equals("AND") || target.equals("OR")){
 			return true;
 		}else {
@@ -672,6 +603,134 @@ public class Gui extends JFrame{
 	
 	// ------------------------------------------------------------------------------------------------------------------------------------
 	
+
+//ActionListener popupMenuActionListener;
+//JTextArea currentTreeDisplay = new JTextArea();
+//DefaultMutableTreeNode currentTreeForDisplay = new DefaultMutableTreeNode();
+//Wish currentNode;
+//Label diverseOutput = new Label();
+
+//JMenuItem menuItem;
+
+
+
+//protected void modifyLine() {
+//DefaultMutableTreeNode node = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
+//
+//}
+//
+//protected void lineDown() {
+//
+//}
+
+//
+//toAND.addActionListener(new ActionListener() {
+//	public void actionPerformed(ActionEvent arg0) {
+//		changeNodeToAND();
+//	}
+//
+//	
+//});
+//
+//toOR.addActionListener(new ActionListener() {
+//	public void actionPerformed(ActionEvent arg0) {
+//		changeNodeToOR();
+//	}
+//	
+//});
+//
+//toNr.addActionListener(new ActionListener() {
+//	public void actionPerformed(ActionEvent arg0) {
+//		changeNodeToNr(newNumberTextField.getText());
+//	}
+//	
+//});
+//
+//addChild.addActionListener(new ActionListener() {
+//	public void actionPerformed(ActionEvent arg0) {
+//		addChild(newNumberTextField.getText());
+//	}
+//
+//	
+//});
+//
+
+//displayTree.addMouseListener(new MouseAdapter() {
+//@Override
+//public void mousePressed(MouseEvent mouseEvent)
+//{
+////    handleContextMenu(mouseEvent);
+//}
+//@Override
+//public void mouseReleased(MouseEvent mouseEvent)
+//{
+////    handleContextMenu(mouseEvent);
+//}
+//});
+
+
+//this.lineDown.setBounds(margin*2+labelWidth,
+//labelHeight*2+margin*3+shiftDown, 
+//labelWidth, 
+//labelHeight); 
+//this.lineUp.setBounds(margin*3+labelWidth*2,
+//labelHeight*2+margin*3+shiftDown,
+//labelWidth, 
+//labelHeight);
+//this.modify.setBounds(margin*4+labelWidth*3, 
+//labelHeight*2+margin*3+shiftDown, 
+//labelWidth, 
+//labelHeight);
+//this.clearTree.setBounds(margin*5+labelWidth*4, 
+//labelHeight*2+margin*3+shiftDown,  
+//labelWidth,
+//labelHeight);
+
+//this.toOR.setBounds(margin*2+labelWidth*3, 
+//		labelHeight*3+margin*4+shiftDown, 
+//		labelWidth, 
+//		labelHeight);
+//this.toAND.setBounds(margin*2+labelWidth*3, 
+//		labelHeight*4+margin*5+shiftDown, 
+//		labelWidth, 
+//		labelHeight);
+//this.toNr.setBounds(margin*2+labelWidth*3, 
+//		labelHeight*5+margin*6+shiftDown, 
+//		labelWidth, 
+//		labelHeight);
+//this.addChild.setBounds(margin*2+labelWidth*3, 
+//		labelHeight*6+margin*7+shiftDown, 
+//		labelWidth, 
+//		labelHeight);
+//this.newNumberTextField.setBounds(margin*3+labelWidth*4, 
+//		labelHeight*5+margin*6+shiftDown, 
+//		labelWidth, 
+//		labelHeight);
+
+
+
+//
+//
+//	protected void handleContextMenu(MouseEvent mouseEvent) {
+//
+//		if (displayTree!= null){
+//			if (mouseEvent.getButton() == 3 ){
+//				this.result.setText("this was a right clic I think");
+//				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
+//				if (selectedNode != null){
+//					popup.show(mouseEvent.getComponent(), mouseEvent.getX(), mouseEvent.getY());
+//				}
+//			}
+////			if (mouseEvent.getButton() == 1 ){
+////				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
+////				this.result.setText(mouseEvent.getComponent().getName());
+////				
+////			}
+//		}
+//	}
+//	
+
+
 //private void updateDisplayTreeListener(){
 //this.displayTree.addMouseListener(new MouseAdapter() {
 //    @Override
@@ -1045,3 +1104,122 @@ public class Gui extends JFrame{
 //	
 //	
 //}
+
+
+//
+//
+//
+//private void createContextMenu(){
+//
+//	
+////	nodeEditMenu = new JPopupMenu();
+//	nodeEditMenu = this.popup;
+//	this.displayTree.setComponentPopupMenu(popup); // TODO 
+//	
+//	remove = new JMenuItem("remove");
+//	nodeEditMenu.add(remove);
+//	
+//	addChildMenu = new JMenu("Add a child:");
+//	nodeEditMenu.add(addChildMenu);
+//
+//	
+//	changeToMenu = new JMenu("change to :");
+//	nodeEditMenu.add(changeToMenu);
+//	
+//	int nrFaces = Integer.parseInt(this.nrFacesTextfield.getText());//todo user imput handling
+////	int nrPresets = WishTree.getAvailablePresets().length;
+//	
+////	JMenuItem[] childrenToAddMenu = new JMenuItem[nrFaces+5+nrPresets];
+////	JMenuItem[] childrenToChangeMenu = new JMenuItem[nrFaces+5+nrPresets];
+//	
+////	JMenuItem[] childrenNeedAddActionListener = new JMenuItem[nrFaces+5+nrPresets];
+////	JMenuItem[]  childrenNeedChangeActionListener = new JMenuItem[nrFaces+5+nrPresets];
+////	-----------------------------------
+////	Vector<JMenuItem> needsActionListenerAdd = new Vector<>();
+////	Vector<JMenuItem> needsActionListenerChange = new Vector<>();
+//	
+////	JMenuItem tmp = new JMenuItem("AND");
+////	needsActionListenerAdd.add(tmp);
+////	addChildMenu.add(tmp);
+////	
+////	tmp = new JMenuItem("OR");
+////	needsActionListenerAdd.add(tmp);
+////	addChildMenu.add(tmp);
+//	
+//	
+////	tmp = new JMenuItem("AND");
+////	needsActionListenerChange.add(tmp);
+////	changeToMenu.add(tmp);
+////	
+////	tmp = new JMenuItem("OR");
+////	needsActionListenerChange.add(tmp);
+////	changeToMenu.add(tmp);
+////	-------------------------------------------------------
+//	
+////	Vector<JMenu> basicMenus = new Vector<>();
+////	basicMenus.add(addChildMenu);
+////	basicMenus.add(changeToMenu);
+////	
+////	setupContextMenuElements("AND",addChildMenu, changeToMenu);
+////	setupContextMenuElements("OR",addChildMenu, changeToMenu);
+////	
+////	
+////	
+////	for (int i = 0; i<nrFaces;i++){
+//////		tmp = new JMenuItem(""+(i+1));
+//////		needsActionListenerAdd.add(tmp);
+//////		addChildMenu.add(tmp);
+//////		
+//////		tmp = new JMenuItem(""+(i+1));
+//////		needsActionListenerChange.add(tmp);
+//////		changeToMenu.add(tmp);
+////		setupContextMenuElements(""+(i+1),addChildMenu, changeToMenu);
+////	}
+////	
+//////	for (int i = 0; i<nrFaces;i++){
+//////		childrenToAddMenu[i+2] = new JMenuItem(""+(i+1));
+//////		childrenToChangeMenu[i+2] =new JMenuItem(""+(i+1));
+//////	}
+////	
+////	
+////	
+////	
+//////	boolean done = false;
+////	int l = 0;
+////	while (l<WishTree.getAvailablePresets().length){
+////		String currPreset = WishTree.getAvailablePresets()[l];
+////		if (currPreset.equalsIgnoreCase("ntupel")){
+////			JMenu ntupelAdd = new JMenu("ntupel");
+////			JMenu ntupelChange = new JMenu("ntupel");
+//////			Vector<JMenu> ntupelMenus = new Vector<>();
+//////			ntupelMenus.add(ntupelChange);
+//////			ntupelMenus.add(ntupelAdd);
+////			addChildMenu.add(ntupelAdd);
+////			changeToMenu.add(ntupelChange);				
+////			for (int i = 0; i<this.getNrDice(); i++){
+//////				tmp = new JMenuItem("ntupel"+(i+1));
+//////				ntupelAdd.add(tmp);
+//////				needsActionListenerAdd.add(tmp);
+//////				
+//////				tmp = new JMenuItem("ntupel"+(i+1));
+//////				ntupelChange.add(tmp);
+//////				needsActionListenerChange.add(tmp);
+////				setupContextMenuElements("ntupel"+(i+1), ntupelAdd,ntupelChange );
+////				}
+////			} else {
+//////				tmp =  new JMenuItem(currPreset);
+//////				needsActionListenerAdd.add(tmp);
+//////				addChildMenu.add(tmp);
+//////				
+//////				tmp =  new JMenuItem(currPreset);
+//////				needsActionListenerChange.add(tmp);
+//////				changeToMenu.add(tmp);
+////				setupContextMenuElements(currPreset, addChildMenu, changeToMenu);
+////				
+////				
+//////				childrenToAddMenu[l+2+nrFaces] = new JMenuItem(currPreset);
+//////				childrenToChangeMenu[l+2+nrFaces] = new JMenuItem(currPreset);
+////			}
+////		
+////		l++;
+////	}
