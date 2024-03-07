@@ -1,0 +1,1175 @@
+---------------MAIN-------------------------
+
+	
+	private static void currentTest(){
+		
+
+		int nrFaces = 6;
+		int nrDice = 6;
+		WishTree testTree = WishTree.zehnTausend();
+		System.out.println(testTree.toString());
+		WishTree.prepareTree(testTree, true, nrDice);
+		
+//		System.out.println(WishTree.andCopy(WishTree.nTupel(nrFaces, 2),3).toString());
+		
+//		
+//		int nrDice = 6;
+//		int nrFaces = 6;
+//		
+//		int[] toKeep = {1, 3};
+//		WishTree testpairs = WishTree.nTupel(nrFaces, 2);
+//		WishTree.prepareTree(testpairs, true);
+//		
+//		WishTree test = WishTree.importAndPrepareTree(irgendwas10000, true);
+//		
+//		Throw testThrow = new Throw(test, nrDice, nrFaces); // TODO seems to be a pb if a goal contains a number  bigger than nrfaces
+//		double res = (double) testThrow.probaCompleteRec(test) / Math.pow(nrFaces, nrDice);
+//		
+//
+//		System.out.println("the proba rec is " + res);
+//		System.out.println("-----------------------------------------------------------------------------");
+//		
+
+	}
+
+//	private static void compareProbCompRecOrNot() {
+//		String[] wishesToTest = new String[16];
+//
+//		String str0 = "(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6))";
+//		String str1 = "(AND;(OR;(AND;(OR;3;5);1);(AND;2;5));(OR;(AND;3;2);1))";
+//		String str2 = "(OR;(AND;1;2;3;4;5;6))";
+//		String str3 = "(OR;(OR;1;5);(AND;(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6))))";
+//		String str4 = "(OR;(OR;1;5);(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6));(AND;(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6));(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6)));(AND;(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6))))";
+//		String str5 = "(OR;(OR;1;5);(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6));(AND;(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6)) ;(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6)) ))";
+//		String str6 = "(AND;(OR;(AND;(OR;3;5);1);(AND;2;5));(OR;(AND;3;2);1))";
+//		String str7 = "(AND;(OR;(AND;(OR;3;5);1);(AND;2;5));(OR;(AND;3;2);1))";
+//		String str8 = "(AND;(OR;3;5);1)";
+//		String str9 = "(AND;(AND;6;6);5)";
+//		String str10 = "(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6))";
+//		String str11 = "(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6))";
+//		String str12 = "(OR;(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6)))";
+//		String str13 = "(OR;(AND;(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6)));(OR;1;5);(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6));(AND;(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6)) ;(OR;(AND;1;1;1);(AND;2;2;2);(AND;3;3;3);(AND;4;4;4);(AND;5;5;5);(AND;6;6;6))))";
+//		String str14 = "(OR;(AND;2;2;3;3);(AND;2;2;3;3);(AND;2;2;3;3))";
+//		String str15 = "(AND;(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6)))";
+//		// String str16 =
+//		// "(AND;(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6));(OR;(AND;1;1);(AND;2;2);(AND;3;3);(AND;4;4);(AND;5;5);(AND;6;6)))";
+//
+//		wishesToTest[0] = str0;
+//		wishesToTest[1] = str1;;
+//		wishesToTest[2] = str2;
+//		wishesToTest[3] = str3;
+//		wishesToTest[4] = str4;
+//		wishesToTest[5] = str5;
+//		wishesToTest[6] = str6;
+//		wishesToTest[7] = str7;
+//		wishesToTest[8] = str8;
+//		wishesToTest[9] = str9;
+//		wishesToTest[10] = str10;
+//		wishesToTest[11] = str11;
+//		wishesToTest[12] = str12;
+//		wishesToTest[13] = str13;
+//		wishesToTest[14] = str14;
+//		wishesToTest[15] = str15;
+//
+//		int nrDice = 6;
+//		int nrFaces = 6;
+//		boolean verbose = false;
+//
+//		WishTree testTree = WishTree.importAndPrepareTree(wishesToTest[15],
+//				true);
+//		Throw testThrow = new Throw(testTree, nrDice, nrFaces);
+//		long resRec = testThrow.probaCompleteRec(testTree);
+//		long resNoRec = testThrow.ProbaComplete(testTree);
+//
+//		if (resRec != resNoRec) {
+//			System.out
+//					.println("ERROR : the proba should be the same. problem with tree : ");
+//			System.out.println(wishesToTest[12]);
+//			System.out.println("--------------------------");
+//			System.out.println(testTree.toString());
+//		}
+//
+//		for (int i = 0; i < wishesToTest.length; i++) {
+//			System.out.println("testing tree nr " + i);
+//
+//			WishTree currTree = WishTree.importAndPrepareTree(wishesToTest[i],
+//					verbose);
+//
+//			// WishTree currTree = WishTree.stringToTree(wishesToTest[i]);
+//			// currTree.simplifyTree();
+//			// currTree.developpTree();
+//			// currTree.normaliseTerminalBranches();
+//			// currTree.removeRedundancy();
+//
+//			Throw currThrow = new Throw(currTree, nrDice, nrFaces);
+//
+//			long iterProba = currThrow.ProbaComplete(currTree);
+//			long recProba = currThrow.probaCompleteRec(currTree);
+//
+//			if (iterProba != recProba) {
+//				System.out
+//						.println("ERROR : the proba should be the same. problem with tree : ");
+//				System.out.println(wishesToTest[i]);
+//				System.out.println("--------------------------");
+//				System.out.println(currTree.toString());
+//			} else {
+//				System.out.println("comparaison nr " + i + " is OK");
+//			}
+//		}
+//	}
+
+	private void testnumberLimits() {
+
+		Integer[] pointer = new Integer[6];
+		pointer[3] = 56;
+		int truc = pointer[3];
+		truc = 89;
+		System.out.println(truc);
+		System.out.println(pointer[3]);
+
+		double doubleTest = (double) ((double) 1 - (1 / Math.pow(10, 10)));//
+		long longtest = (long) Math.pow(10, 10);
+		System.out.println(doubleTest);
+		System.out.println(longtest);
+		System.out.println(Integer.MAX_VALUE);
+	}
+	
+	
+	
+----------------------------WISHTREE--------------------------------
+
+
+
+	public void normaliseTerminalBranches_old() { // transforms nr nodes in and
+													// nodes with the number. Ex
+													// : 1 -> (AND;1)
+		int i = 0;
+		Vector<WishTree> normalisedChildren = new Vector<WishTree>();
+		// WishTree leaves = new WishTree(this.getNode().isAND(),
+		// this.getNode().isOR()); // TODO : check if this works
+		WishTree leaves = new WishTree(true, false);
+		for (WishTree child : this.getChildren()) {
+			if (child.isNR()) {
+				// WishTree normChild = new WishTree(true, false);
+				leaves.addChild(child);
+				// normalisedChildren.add(normChild);
+			} else if (child.isAND()) {
+				normalisedChildren.add(child);
+			} else {
+				System.out
+						.println("you should not see that, normaliseTerminalBranche called with wrong arguments ");
+			}
+		}
+		if (!(leaves.getChildren() == null || leaves.getChildren().isEmpty())) {
+
+			normalisedChildren.add(leaves);
+		}
+		this.resetChildren();
+		this.addChildren(normalisedChildren);
+
+	}
+	
+	
+		public void checkAndRepairNode(WishTree parent){ // TODO this is wrong
+		if (fixable){
+			
+//		if (this.node.isNR() && this.getChildren() != null){
+			if (parent != null && parent.isNR()){
+				System.out.println("A leaf cann't have children!");
+				System.out.println("Tree is not fixable.");
+				this.setFixable(false);
+				parent.setFixable(false);
+			}
+			if (parent!= null && (this.isAND()||this.isOR() )){
+				if ( ((Integer)this.getChildren().size()).equals(0)){
+					parent.getChildren().remove(this);
+				}
+				if ( ((Integer)this.getChildren().size()).equals(1)){
+					parent.getChildren().remove(this);
+					parent.getChildren().addAll(this.getChildren());
+					return ;
+				}
+			}
+			List<WishTree> children = this.getChildren();
+			if (children != null){
+				for (WishTree child : children){
+					child.checkAndRepairNode(this);
+				}
+			}
+
+		} else {
+			if (!this.isFixable() && parent != null){
+				parent.setFixable(false);
+			}
+		}
+		
+
+	}
+	
+		public void suppressBigChildren(int nrDice){//TODO include int usedDice
+		Vector<WishTree> toRemove = new Vector<>();
+		
+		if (this.getChildren() != null){
+			for (WishTree child : this.getChildren()){
+				if (child.getMinNrDiceForBranch()>nrDice){
+					toRemove.add(child);
+				}
+			}
+			this.getChildren().removeAll(toRemove);
+		}
+		
+		if (this.getChildren() != null){
+			for (WishTree child : this.getChildren()){
+				child.suppressBigChildren(nrDice);
+			}
+			
+		}
+		
+		
+	}
+	
+	
+	
+	public int calculateMinNrDiceForBranches_old(){ //TODO include int usedDice. should be this.getNumberChildren
+		int res=0;
+
+		
+		if (this.isAND()){
+			for (WishTree child : this.getChildren()){
+				res += child.calculateMinNrDiceForBranches_old();
+			}
+		}
+		
+		if (this.isNR()){
+			res = 1;
+		}
+		
+		
+		if (this.isOR()){
+			for (WishTree child : this.getChildren()){
+				if (res == 0){
+					res = child.calculateMinNrDiceForBranches_old();
+				} else{
+
+					res = Math.min(res, child.calculateMinNrDiceForBranches_old());
+				}
+			}
+		}
+		
+		this.setMinNrDiceForBranch(res);
+		return res;
+		
+	}
+	
+	public int calculateMinNrDiceForBranches_old_old(int usedDice){ //todo : maybe false, just use the old and do another run to add down
+		int res = 0;
+		
+		
+		if (this.isAND()){
+			int nrNRChild = this.getChildren(false, false, true).size();
+			res += nrNRChild;
+			for (WishTree child : this.getChildren(true, true, false)){
+				res += child.calculateMinNrDiceForBranches_old_old(usedDice+nrNRChild);
+			}
+		}
+		
+		if (this.isOR()){
+			if (this.getChildren(false,  false, true) != null && this.getChildren(false, false, true).size() != 0){
+				res = 1;
+			}
+			for (WishTree child : this.getChildren(true, true, false)){
+				if (res == 0){
+					res = child.calculateMinNrDiceForBranches_old_old(usedDice);
+				} else{
+
+					res = Math.min(res, child.calculateMinNrDiceForBranches_old_old(usedDice));
+				}
+			}
+		}
+		
+		this.setMinNrDiceForBranch(res+usedDice);
+		return res+usedDice;
+		
+	}
+	
+	
+	
+//public static WishTree nTupel(int nrFaces, int n, int[] toKeep){
+//WishTree newTree = new WishTree(false, true);
+//for (int i : toKeep){
+//	WishTree newChild = new WishTree(true, false);
+//	for (int j = 1; j<=n; j++){
+//		newChild.addChild(new WishTree(i));
+//	}
+//	newTree.addChild(newChild);
+//}
+//return newTree;
+//}
+//
+//public static WishTree fastStrasseOrStrasse(int nrFaces){
+//WishTree result = new WishTree(false, true);
+//
+//for (int i=1; i<= nrFaces; i++){
+//	WishTree currChild = new WishTree(true, false);
+//	for (int j=1; j<= nrFaces; j++){
+//		if (j != i){
+//			currChild.addChild(new WishTree(j));
+//		}
+//	}
+//	result.addChild(currChild);
+//}
+//
+//return result;
+//}
+
+
+-----------------------THROW------------------------------------
+
+//	long getBit(long n, int k) { // return the kth bit of the number n
+//		if (k > Integer.toBinaryString((int) n).length()) {
+//			System.out.println("ERROR the number " + n + "has less than " + k
+//					+ "bits");
+//		}
+//		return (n >> k) & 1;
+//	}
+
+
+//	private void removeBigChildren(WishTree developpedNormalisedTree) { 
+//		Vector<WishTree> toRemove = new Vector<WishTree>();// supresses children
+//															// that have more
+//															// numbers than
+//															// this.nrDice
+//		for (WishTree child : developpedNormalisedTree.getChildren()) {
+//			if (developpedNormalisedTree.isAND() && child.getChildren().size() > this.nrDice) {
+//				toRemove.add(child);
+//			}
+//		}
+//		developpedNormalisedTree.getChildren().removeAll(toRemove);
+//
+//		if (toRemove.size() > 0) {
+//			System.out
+//					.println("removed AND children that were too big. new tree : ");
+//			System.out.println(developpedNormalisedTree.toString());
+//		}
+//
+//	}
+	
+	
+	private boolean areSimilar(Integer[] goal1, Integer[] goal2) { // TODO check
+																	// if
+																	// goal[i]
+																	// can be
+																	// null or
+																	// if it's
+																	// initialised
+																	// to 0
+		Integer[] stacks1 = new Integer[this.nrFaces];
+		for (int i = 0; i < this.nrFaces; i++) {
+			stacks1[i] = 0;
+		}
+		Integer[] stacks2 = new Integer[this.nrFaces];
+		for (int i = 0; i < this.nrFaces; i++) {
+			stacks2[i] = 0;
+		}
+
+		for (int i = 0; i < this.nrFaces; i++) {
+			for (int j = 0; j < this.nrFaces; j++) {
+				if (goal1[j] == i) { // (goal1[j] == null && i == 0 ) ||
+					stacks1[i]++;
+				}
+			}
+		}
+
+		for (int i = 0; i < this.nrFaces; i++) {
+			for (int j = 0; j < this.nrFaces; j++) {
+				if (goal2[j] == i) { // (goal1[j] == null && i == 0 ) ||
+					stacks2[i]++;
+				}
+			}
+		}
+
+		boolean res = true;
+
+		for (int i = 0; i < this.nrFaces; i++) {
+			if (stacks1[i] != stacks2[i]) {
+				res = false;
+			}
+		}
+
+		return res;
+	}
+	
+	
+		public long ProbaComplete(WishTree tree) {// only call on developp and
+												// normalised trees
+		// at this point, node should be a OR with terminal AND children
+
+		if (verbose) {
+			System.out.println("starting to compute");
+		}
+//		removeBigChildren(tree);
+		removeBigValues(tree);
+
+		// float res = 0;
+		long res = 0;
+		int nrBranch = tree.getChildren().size();
+
+		for (long i = 1; i < Math.pow(2, nrBranch); i++) { // the binary
+															// representation of
+															// i tells which
+															// child to consider
+			// TODO opti : can delete the values of i that are superfluous
+			// (because biger intersection than some that were already rejected)
+			// //TODO opti : the for has to be replaces with a recursive thing
+			// that doesn't go deeper if the intersection is not to be
+			// calculated
+
+			// System.out.println(Integer.toBinaryString(i) +
+			// " is intersection i in binary");
+
+			System.out.println(i + " < " + Math.pow(2, nrBranch)
+					+ " (nrBranch = " + nrBranch + ")");
+
+			List<WishTree> tempChildren;
+			// WishTree currIntersec;
+			tempChildren = childrenToIntersectBinRep(i, tree);
+
+			boolean calculateTheIntersection = true;
+			// currIntersec = intersectBranches(tempChildren);
+
+			Integer[] currGoal = new Integer[this.nrFaces];
+			for (int j = 0; j < this.nrFaces; j++) {
+				currGoal[j] = 0;
+			}
+
+			int j = 0;
+			int tempSize = 0;
+			boolean weiter = true;
+			while ((j < tempChildren.size()) && weiter) {// cardinal(currGoal) <
+															// this.nrDice
+				Integer[] tempGoal = terminalBranchToIntArray(tempChildren
+						.get(j));
+				// int tempSize2 = sizeOfGoal(tempGoal);
+
+				Integer[] testGoal = intersectGoals(currGoal, tempGoal);
+				int testSize = sizeOfGoal(testGoal);
+				if (testSize > this.nrDice) {// this condition is false
+					calculateTheIntersection = false;
+					weiter = false;
+				} else {
+					currGoal = testGoal;
+					tempSize = testSize;
+					j++;
+				}
+			}
+
+			if (calculateTheIntersection) {
+
+				// int toAdd = (int) ( ProbaBranch(currGoal) * Math.pow(
+				// (-1),tempChildren.size()+1 ) );
+				int toAdd = (int) (probaBranchOpitForRepetitions((currGoal)) * Math
+						.pow((-1), tempChildren.size() + 1));
+
+				// System.out.println("Adding " +
+				// (double)toAdd/Math.pow(this.nrFaces, this.nrDice) +
+				// " to the proba (" + toAdd + " favourable cases)");
+				// System.out.println(goalToString(currGoal));
+
+				long testMaxRes = res;
+
+				res += toAdd;
+				if (res < 0) {
+					System.out.println("The result is " + res);
+					System.out.println("previous result was : " + testMaxRes);
+				}
+			}
+		}
+
+		// return (double) (res*(1/Math.pow(this.nrFaces, this.nrDice)));
+		return res;
+	}
+	
+	
+	private List<WishTree> childrenToIntersectBinRep(long binRepres,
+			WishTree tree) {
+		List<WishTree> res = new Vector<WishTree>();
+
+		int k = 0;
+		while (Math.pow(2, k) <= binRepres * 2) { // TODO check border cases
+			if (getBit(binRepres, k) == 1) {
+				res.add(tree.getChildren().get(k));
+			}
+			k++;
+		}
+
+		return res;
+	}
+	
+	
+	
+	
+	---------------------GUI--------------------------------
+	
+	
+	// ------------------------------------------------------------------------------------------------------------------------------------
+
+//	private void increaseNrDice() {
+//		int currNrDice = this.getNrDice();
+//		if (currNrDice<MAX_NR_DICE){
+//			this.nrDiceLabel.setText(""+(currNrDice+1));
+//			this.popup = new JPopupMenu();
+//			createContextMenu();
+//		}
+//	}
+//	
+//	private void decreaseNrDice() {
+//		int currNrDice = this.getNrDice();
+//		if (currNrDice > 1){
+//			this.nrDiceLabel.setText(""+(currNrDice-1));
+//			this.popup = new JPopupMenu();
+//			createContextMenu();
+//		}
+//	}
+//	
+//	private void increaseNrFaces() {
+//		int currNrFaces = this.getNrFaces();
+//		if (currNrFaces < MAX_NR_FACES){
+//			this.nrFacesLabel.setText(""+(currNrFaces+1));
+//			this.popup = new JPopupMenu();
+//			createContextMenu();
+//		}
+//	}
+//	
+//	private void decreaseNrFaces() {
+//		int currNrFaces = this.getNrFaces();
+//		if (currNrFaces > 2){
+//			this.nrFacesLabel.setText(""+(currNrFaces-1));
+//			this.popup = new JPopupMenu();
+//			createContextMenu();
+//		}
+//	}
+	
+	// ------------------------------------------------------------------------------------------------------------------------------------
+	
+
+//ActionListener popupMenuActionListener;
+//JTextArea currentTreeDisplay = new JTextArea();
+//DefaultMutableTreeNode currentTreeForDisplay = new DefaultMutableTreeNode();
+//Wish currentNode;
+//Label diverseOutput = new Label();
+
+//JMenuItem menuItem;
+
+
+
+//protected void modifyLine() {
+//DefaultMutableTreeNode node = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
+//
+//}
+//
+//protected void lineDown() {
+//
+//}
+
+//
+//toAND.addActionListener(new ActionListener() {
+//	public void actionPerformed(ActionEvent arg0) {
+//		changeNodeToAND();
+//	}
+//
+//	
+//});
+//
+//toOR.addActionListener(new ActionListener() {
+//	public void actionPerformed(ActionEvent arg0) {
+//		changeNodeToOR();
+//	}
+//	
+//});
+//
+//toNr.addActionListener(new ActionListener() {
+//	public void actionPerformed(ActionEvent arg0) {
+//		changeNodeToNr(newNumberTextField.getText());
+//	}
+//	
+//});
+//
+//addChild.addActionListener(new ActionListener() {
+//	public void actionPerformed(ActionEvent arg0) {
+//		addChild(newNumberTextField.getText());
+//	}
+//
+//	
+//});
+//
+
+//displayTree.addMouseListener(new MouseAdapter() {
+//@Override
+//public void mousePressed(MouseEvent mouseEvent)
+//{
+////    handleContextMenu(mouseEvent);
+//}
+//@Override
+//public void mouseReleased(MouseEvent mouseEvent)
+//{
+////    handleContextMenu(mouseEvent);
+//}
+//});
+
+
+//this.lineDown.setBounds(margin*2+labelWidth,
+//labelHeight*2+margin*3+shiftDown, 
+//labelWidth, 
+//labelHeight); 
+//this.lineUp.setBounds(margin*3+labelWidth*2,
+//labelHeight*2+margin*3+shiftDown,
+//labelWidth, 
+//labelHeight);
+//this.modify.setBounds(margin*4+labelWidth*3, 
+//labelHeight*2+margin*3+shiftDown, 
+//labelWidth, 
+//labelHeight);
+//this.clearTree.setBounds(margin*5+labelWidth*4, 
+//labelHeight*2+margin*3+shiftDown,  
+//labelWidth,
+//labelHeight);
+
+//this.toOR.setBounds(margin*2+labelWidth*3, 
+//		labelHeight*3+margin*4+shiftDown, 
+//		labelWidth, 
+//		labelHeight);
+//this.toAND.setBounds(margin*2+labelWidth*3, 
+//		labelHeight*4+margin*5+shiftDown, 
+//		labelWidth, 
+//		labelHeight);
+//this.toNr.setBounds(margin*2+labelWidth*3, 
+//		labelHeight*5+margin*6+shiftDown, 
+//		labelWidth, 
+//		labelHeight);
+//this.addChild.setBounds(margin*2+labelWidth*3, 
+//		labelHeight*6+margin*7+shiftDown, 
+//		labelWidth, 
+//		labelHeight);
+//this.newNumberTextField.setBounds(margin*3+labelWidth*4, 
+//		labelHeight*5+margin*6+shiftDown, 
+//		labelWidth, 
+//		labelHeight);
+
+
+
+//
+//
+//	protected void handleContextMenu(MouseEvent mouseEvent) {
+//
+//		if (displayTree!= null){
+//			if (mouseEvent.getButton() == 3 ){
+//				this.result.setText("this was a right clic I think");
+//				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
+//				if (selectedNode != null){
+//					popup.show(mouseEvent.getComponent(), mouseEvent.getX(), mouseEvent.getY());
+//				}
+//			}
+////			if (mouseEvent.getButton() == 1 ){
+////				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
+////				this.result.setText(mouseEvent.getComponent().getName());
+////				
+////			}
+//		}
+//	}
+//	
+
+
+//private void updateDisplayTreeListener(){
+//this.displayTree.addMouseListener(new MouseAdapter() {
+//    @Override
+//    public void mousePressed(MouseEvent mouseEvent)
+//    {
+//        handleContextMenu(mouseEvent);
+//    }
+//    @Override
+//    public void mouseReleased(MouseEvent mouseEvent)
+//    {
+////        handleContextMenu(mouseEvent);
+//    }
+//});
+//}
+
+
+//
+//
+//private void changeNodeToAND() {
+//	DefaultMutableTreeNode node = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
+//	if (node != null){
+//		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+//		int index = parent.getIndex(node);
+////		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new Wish(true, false, false, -1));
+//		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("AND");
+//		parent.insert(newNode, index);
+//		node.removeFromParent();			
+//	
+//	int nrChildren = node.getChildCount();
+//	if (nrChildren == 0){
+////			newNode.add(node);
+//			newNode.add(new DefaultMutableTreeNode("1"));
+//			newNode.add(new DefaultMutableTreeNode("1"));
+//		}else{
+//			int i = 0;
+//			while (i<nrChildren){
+////			newNode.add((DefaultMutableTreeNode) node.getChildAt(i));
+//				newNode.add((DefaultMutableTreeNode) node.getFirstChild());
+//				i++;
+//			}
+//		}	
+//
+//	}
+//	
+//	redrawTree();
+//	
+//}
+//
+//private void changeNodeToOR() {
+//	DefaultMutableTreeNode node = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
+//	if (node != null){
+//		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+//		int index = parent.getIndex(node);
+//		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("OR");
+//		parent.insert(newNode, index);
+//		node.removeFromParent();			
+//	
+//	int nrChildren = node.getChildCount();
+//	if (nrChildren == 0){
+////			newNode.add(node);
+////			newNode.add(new DefaultMutableTreeNode(new Wish(false, false, true, 1)));
+////			newNode.add(new DefaultMutableTreeNode(new Wish(false, false, true, 1)));
+//			newNode.add(new DefaultMutableTreeNode("1"));
+//			newNode.add(new DefaultMutableTreeNode("1"));
+//		}else{
+//			int i = 0;
+//			while (i<nrChildren){
+////			newNode.add((DefaultMutableTreeNode) node.getChildAt(i));
+//				newNode.add((DefaultMutableTreeNode) node.getFirstChild());
+//				i++;
+//			}
+//		}	
+//
+//	}
+//	
+//	redrawTree();
+//	
+//}
+//
+//protected void changeNodeToNr(String text) {
+//	
+//	if (isValidNode(text)){
+//		DefaultMutableTreeNode node = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
+//		if (node != null){
+//			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+//			int index = parent.getIndex(node);
+//			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(text);
+//			parent.insert(newNode, index);
+//			node.removeFromParent();			
+//		
+//			int nrChildren = node.getChildCount();
+//			if (nrChildren != 0){
+//				node.removeAllChildren();
+//			}
+//		}
+//
+//		redrawTree();
+//	}
+//	
+//	
+//}
+
+//JButton lineUp = new JButton("UP");
+//JButton lineDown = new JButton("DOWN");
+//JButton modify = new JButton("modify");
+//
+//JButton toOR = new JButton("Change to OR");
+//JButton toAND = new JButton("Change to AND");
+//JButton toNr = new JButton("Change to following number");
+//JTextField newNumberTextField = new JTextField();
+//JButton addChild = new JButton("Add a child");
+
+
+//	private WishTree displayTreeToCurrent(JTree tree) {
+//		TreeModel model = tree.getModel();
+//		System.out.println(model.toString());
+//		
+////		Wish currentNode = new Wish(node)
+////		if (tree != null)
+////		
+////		DefaultMutableTreeNode currentNode = new DefaultMutableTreeNode(tree.getNode().toString());
+////		
+////		if (tree.getChildren() != null){
+////			for (WishTree child : tree.getChildren()){
+////				currentNode.add(currentTreeToDisplay(child));
+////				
+////			}
+////		}
+////		
+//		return null;
+//	}
+//
+//	private DefaultMutableTreeNode stringToDisplayTree(String userString) {
+//		
+//		int i = 0;
+//		if (!(userString.charAt(i) == '(')) { // if it doesn't start with a
+//													// parenthesis, it must be a
+//													// number
+//			int res;
+//			res = Integer.parseInt(userString);
+//			DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(new Wish(false, false, true, res));
+//			return leaf;//
+//
+//		} else {
+//			i++;
+//			int j = userString.indexOf(";", i);
+//			String[] childStrings = new String[userString.length()]; // length  overkill  but  wathever for now
+//			String operator = userString.substring(i, j); // at this point, operator should be AND  or OR. substring should be exclusive for the max bound
+//			
+//
+//			i = j + 1;
+//			int childNr = 0;
+//			int parenthesis = 1;
+//
+//			while (parenthesis > 0) {
+//				char c = userString.charAt(i);
+//				String s = String.valueOf(c);
+//				if (c == '(') {
+//					parenthesis++;
+//					if (parenthesis == 2) {
+//						childStrings[childNr] = s;
+//					} else {
+//						childStrings[childNr] += s;
+//					}
+//				} else if (c == ')') {
+//					parenthesis--;
+//					if (!(parenthesis == 0)) {
+//						childStrings[childNr] += s;
+//					}
+//
+//				} else if (c == ';' && parenthesis == 1) {
+//					childNr++;
+//				} else {
+//					if (childStrings[childNr] == null) {
+//						childStrings[childNr] = s;
+//					} else {
+//						childStrings[childNr] += s;
+//					}
+//
+//				}
+//
+//				i++;
+//			} // at the end of this while, every child should be stored as a
+//				// valid string in the childStrinds vector
+//
+//			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode();
+//			if (operator.equals("AND")) {
+////				DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new Wish(true, false, false, -1));
+//				newNode.setUserObject(new Wish(true, false, false, -1));
+//			}
+//			if (operator.equals("OR")) {
+////				DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new Wish(false, true, false, -1));
+//				newNode.setUserObject(new Wish(false, true, false, -1));
+//			}
+//			for (String childString : childStrings) {
+//				if (childString != null) {
+//
+//					newNode.add(stringToDisplayTree(childString));
+//				}
+//			}
+//			return newNode;
+//		}
+//	}
+//	
+//	private DefaultMutableTreeNode stringToDisplayTreeNoLink(String userString) {
+//		
+//		int i = 0;
+//		if (!(userString.charAt(i) == '(')) { // if it doesn't start with a
+//													// parenthesis, it must be a
+//													// number
+////			int res;
+////			res = Integer.parseInt(userString);
+//			DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(userString);
+//			return leaf;//
+//
+//		} else {
+//			i++;
+//			int j = userString.indexOf(";", i);
+//			String[] childStrings = new String[userString.length()]; // length  overkill  but  wathever for now
+//			String operator = userString.substring(i, j); // at this point, operator should be AND  or OR. substring should be exclusive for the max bound
+//			
+//
+//			i = j + 1;
+//			int childNr = 0;
+//			int parenthesis = 1;
+//
+//			while (parenthesis > 0) {
+//				char c = userString.charAt(i);
+//				String s = String.valueOf(c);
+//				if (c == '(') {
+//					parenthesis++;
+//					if (parenthesis == 2) {
+//						childStrings[childNr] = s;
+//					} else {
+//						childStrings[childNr] += s;
+//					}
+//				} else if (c == ')') {
+//					parenthesis--;
+//					if (!(parenthesis == 0)) {
+//						childStrings[childNr] += s;
+//					}
+//
+//				} else if (c == ';' && parenthesis == 1) {
+//					childNr++;
+//				} else {
+//					if (childStrings[childNr] == null) {
+//						childStrings[childNr] = s;
+//					} else {
+//						childStrings[childNr] += s;
+//					}
+//
+//				}
+//
+//				i++;
+//			} // at the end of this while, every child should be stored as a
+//				// valid string in the childStrinds vector
+//
+//			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(operator);
+////			if (operator.equals("AND")) {
+//////				DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new Wish(true, false, false, -1));
+//////				newNode.setUserObject("AND");
+////			}
+////			if (operator.equals("OR")) {
+//////				DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new Wish(false, true, false, -1));
+//////				newNode.setUserObject("OR");
+////			}
+//			for (String childString : childStrings) {
+//				if (childString != null) {
+//
+//					newNode.add(stringToDisplayTreeNoLink(childString));
+//				}
+//			}
+//			return newNode;
+//		}
+//	}
+//
+
+	
+
+
+//protected void lineUp() {
+//	if (this.currentLine >-1 ){//&& this.currentTreeDisplay.getText().split("[\n|\r]").length < currentLine
+//		String res = "";
+//		Scanner scanner = new Scanner(this.currentTreeDisplay.getText());
+//		int i = 0;
+//		while (scanner.hasNextLine()) {
+//			String line = scanner.nextLine();
+//			if (i==currentLine +1 ){
+//				String newLine = "[" + line + "]";
+//				res += newLine + "\n";
+//			} else if (i == currentLine && scanner.hasNextLine()){
+//				String newline = line.substring(1, line.length()); // bounds prbly wrong, should remove the []
+//				res += newline+ "\n";
+//
+//			}else {
+//				res += line+ "\n";
+//			}
+//			this.currentLine++;
+//		}
+//		scanner.close();
+//		this.currentTreeDisplay.setText(res);
+//	}
+//}
+
+
+//protected void lineDown() {
+//		if (this.currentLine >0){
+//			this.currentLine--;
+//			String res = "";
+//			Scanner scanner = new Scanner(this.currentTreeDisplay.getText());
+//			int i = 0;
+//			while (scanner.hasNextLine()) {
+//			  String line = scanner.nextLine();
+//			  if (i==currentLine){
+//				  String newLine = "[" + line + "]";
+//				  res += newLine + "\n";
+//			  } else if (i == currentLine+1){
+//				  String newline = line.substring(1, line.length()); // bounds prbly wrong, should remove the []
+//				  res += newline+ "\n";
+//				  
+//			  }else {
+//				  res += line+ "\n";
+//			  }
+//			}
+//			scanner.close();
+//			this.currentTreeDisplay.setText(res);
+//		}
+//		
+//	}
+
+
+
+
+
+//private void changeNodeTo(String target) {
+//	
+//	Wish wish = Wish.wishFromString(target);
+//	
+////	if (target=="AND" || target == "OR" || i>0){ //doesn't check if target < nrFaces
+//	if (wish != null){
+//		DefaultMutableTreeNode node = (DefaultMutableTreeNode) displayTree.getLastSelectedPathComponent();
+//		if (node != null){
+//			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+//			int index = parent.getIndex(node);
+//			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(wish);
+//			parent.insert(newNode, index);
+//			newNode.setParent(parent);
+//			
+//			node.removeFromParent();
+//			int nrChildren = node.getChildCount();
+//			if (nrChildren == 0){
+////				newNode.add(node);
+//				newNode.add(new DefaultMutableTreeNode(new Wish(false, false, true, 1)));
+//				newNode.add(new DefaultMutableTreeNode(new Wish(false, false, true, 1)));
+//			}else{
+//				int i = 0;
+//				while (i<nrChildren){
+////					newNode.add((DefaultMutableTreeNode) node.getChildAt(i));
+//					newNode.add((DefaultMutableTreeNode) node.getFirstChild());
+//					i++;
+//				}
+//			}
+//			
+//			
+//			
+//					
+//			redrawTree();
+//		}
+//	}
+//	
+//	
+//	
+//}
+
+
+//
+//
+//
+//private void createContextMenu(){
+//
+//	
+////	nodeEditMenu = new JPopupMenu();
+//	nodeEditMenu = this.popup;
+//	this.displayTree.setComponentPopupMenu(popup); // TODO 
+//	
+//	remove = new JMenuItem("remove");
+//	nodeEditMenu.add(remove);
+//	
+//	addChildMenu = new JMenu("Add a child:");
+//	nodeEditMenu.add(addChildMenu);
+//
+//	
+//	changeToMenu = new JMenu("change to :");
+//	nodeEditMenu.add(changeToMenu);
+//	
+//	int nrFaces = Integer.parseInt(this.nrFacesTextfield.getText());//todo user imput handling
+////	int nrPresets = WishTree.getAvailablePresets().length;
+//	
+////	JMenuItem[] childrenToAddMenu = new JMenuItem[nrFaces+5+nrPresets];
+////	JMenuItem[] childrenToChangeMenu = new JMenuItem[nrFaces+5+nrPresets];
+//	
+////	JMenuItem[] childrenNeedAddActionListener = new JMenuItem[nrFaces+5+nrPresets];
+////	JMenuItem[]  childrenNeedChangeActionListener = new JMenuItem[nrFaces+5+nrPresets];
+////	-----------------------------------
+////	Vector<JMenuItem> needsActionListenerAdd = new Vector<>();
+////	Vector<JMenuItem> needsActionListenerChange = new Vector<>();
+//	
+////	JMenuItem tmp = new JMenuItem("AND");
+////	needsActionListenerAdd.add(tmp);
+////	addChildMenu.add(tmp);
+////	
+////	tmp = new JMenuItem("OR");
+////	needsActionListenerAdd.add(tmp);
+////	addChildMenu.add(tmp);
+//	
+//	
+////	tmp = new JMenuItem("AND");
+////	needsActionListenerChange.add(tmp);
+////	changeToMenu.add(tmp);
+////	
+////	tmp = new JMenuItem("OR");
+////	needsActionListenerChange.add(tmp);
+////	changeToMenu.add(tmp);
+////	-------------------------------------------------------
+//	
+////	Vector<JMenu> basicMenus = new Vector<>();
+////	basicMenus.add(addChildMenu);
+////	basicMenus.add(changeToMenu);
+////	
+////	setupContextMenuElements("AND",addChildMenu, changeToMenu);
+////	setupContextMenuElements("OR",addChildMenu, changeToMenu);
+////	
+////	
+////	
+////	for (int i = 0; i<nrFaces;i++){
+//////		tmp = new JMenuItem(""+(i+1));
+//////		needsActionListenerAdd.add(tmp);
+//////		addChildMenu.add(tmp);
+//////		
+//////		tmp = new JMenuItem(""+(i+1));
+//////		needsActionListenerChange.add(tmp);
+//////		changeToMenu.add(tmp);
+////		setupContextMenuElements(""+(i+1),addChildMenu, changeToMenu);
+////	}
+////	
+//////	for (int i = 0; i<nrFaces;i++){
+//////		childrenToAddMenu[i+2] = new JMenuItem(""+(i+1));
+//////		childrenToChangeMenu[i+2] =new JMenuItem(""+(i+1));
+//////	}
+////	
+////	
+////	
+////	
+//////	boolean done = false;
+////	int l = 0;
+////	while (l<WishTree.getAvailablePresets().length){
+////		String currPreset = WishTree.getAvailablePresets()[l];
+////		if (currPreset.equalsIgnoreCase("ntupel")){
+////			JMenu ntupelAdd = new JMenu("ntupel");
+////			JMenu ntupelChange = new JMenu("ntupel");
+//////			Vector<JMenu> ntupelMenus = new Vector<>();
+//////			ntupelMenus.add(ntupelChange);
+//////			ntupelMenus.add(ntupelAdd);
+////			addChildMenu.add(ntupelAdd);
+////			changeToMenu.add(ntupelChange);				
+////			for (int i = 0; i<this.getNrDice(); i++){
+//////				tmp = new JMenuItem("ntupel"+(i+1));
+//////				ntupelAdd.add(tmp);
+//////				needsActionListenerAdd.add(tmp);
+//////				
+//////				tmp = new JMenuItem("ntupel"+(i+1));
+//////				ntupelChange.add(tmp);
+//////				needsActionListenerChange.add(tmp);
+////				setupContextMenuElements("ntupel"+(i+1), ntupelAdd,ntupelChange );
+////				}
+////			} else {
+//////				tmp =  new JMenuItem(currPreset);
+//////				needsActionListenerAdd.add(tmp);
+//////				addChildMenu.add(tmp);
+//////				
+//////				tmp =  new JMenuItem(currPreset);
+//////				needsActionListenerChange.add(tmp);
+//////				changeToMenu.add(tmp);
+////				setupContextMenuElements(currPreset, addChildMenu, changeToMenu);
+////				
+////				
+//////				childrenToAddMenu[l+2+nrFaces] = new JMenuItem(currPreset);
+//////				childrenToChangeMenu[l+2+nrFaces] = new JMenuItem(currPreset);
+////			}
+////		
+////		l++;
+////	}
+	
+	

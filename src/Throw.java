@@ -11,11 +11,6 @@ public class Throw { // this is wrong !!
 
 	private long[] factoriels;
 	private Vector<StackWithProba> stacksWithProbas;
-
-//	public static Vector<String> availablePresets = new Vector<String>("pair", "ntupel", "street", "partialstreet", "tenthousand"); 
-	
-	
-//	this.availablePresets =  {"pair", "ntupel", "street", "partialstreet", "tenthousand"};
 	
 	public Throw(WishTree tree, int nrDice, int nrFaces) {
 		this.nrDice = nrDice;
@@ -62,8 +57,8 @@ public class Throw { // this is wrong !!
 		
 		int nrBranch = tree.getChildren().size();
 		if (nrBranch == 0){
-			System.out.println("this tree has no branches. here you go, have a number. you know what it means?");
-			return 1;
+			System.out.println("this tree has no branches. Probable cause : no wish was doable. setting probability to 0");
+			return 0;
 		}
 		Integer[] currIntersec = new Integer[nrBranch];
 		currIntersec[0] = 1;
@@ -172,97 +167,6 @@ public class Throw { // this is wrong !!
 		return currGoal;
 	}
 
-	public long ProbaComplete(WishTree tree) {// only call on developp and
-												// normalised trees
-		// at this point, node should be a OR with terminal AND children
-
-		if (verbose) {
-			System.out.println("starting to compute");
-		}
-//		removeBigChildren(tree);
-		removeBigValues(tree);
-
-		// float res = 0;
-		long res = 0;
-		int nrBranch = tree.getChildren().size();
-
-		for (long i = 1; i < Math.pow(2, nrBranch); i++) { // the binary
-															// representation of
-															// i tells which
-															// child to consider
-			// TODO opti : can delete the values of i that are superfluous
-			// (because biger intersection than some that were already rejected)
-			// //TODO opti : the for has to be replaces with a recursive thing
-			// that doesn't go deeper if the intersection is not to be
-			// calculated
-
-			// System.out.println(Integer.toBinaryString(i) +
-			// " is intersection i in binary");
-
-			System.out.println(i + " < " + Math.pow(2, nrBranch)
-					+ " (nrBranch = " + nrBranch + ")");
-
-			List<WishTree> tempChildren;
-			// WishTree currIntersec;
-			tempChildren = childrenToIntersectBinRep(i, tree);
-
-			boolean calculateTheIntersection = true;
-			// currIntersec = intersectBranches(tempChildren);
-
-			Integer[] currGoal = new Integer[this.nrFaces];
-			for (int j = 0; j < this.nrFaces; j++) {
-				currGoal[j] = 0;
-			}
-
-			int j = 0;
-			int tempSize = 0;
-			boolean weiter = true;
-			while ((j < tempChildren.size()) && weiter) {// cardinal(currGoal) <
-															// this.nrDice
-				Integer[] tempGoal = terminalBranchToIntArray(tempChildren
-						.get(j));
-				// int tempSize2 = sizeOfGoal(tempGoal);
-
-				Integer[] testGoal = intersectGoals(currGoal, tempGoal);
-				int testSize = sizeOfGoal(testGoal);
-				if (testSize > this.nrDice) {// this condition is false
-					calculateTheIntersection = false;
-					weiter = false;
-				} else {
-					currGoal = testGoal;
-					tempSize = testSize;
-					j++;
-				}
-			}
-
-			if (calculateTheIntersection) {
-
-				// int toAdd = (int) ( ProbaBranch(currGoal) * Math.pow(
-				// (-1),tempChildren.size()+1 ) );
-				int toAdd = (int) (probaBranchOpitForRepetitions((currGoal)) * Math
-						.pow((-1), tempChildren.size() + 1));
-
-				// System.out.println("Adding " +
-				// (double)toAdd/Math.pow(this.nrFaces, this.nrDice) +
-				// " to the proba (" + toAdd + " favourable cases)");
-				// System.out.println(goalToString(currGoal));
-
-				long testMaxRes = res;
-
-				res += toAdd;
-				if (res < 0) {
-					System.out.println("The result is " + res);
-					System.out.println("previous result was : " + testMaxRes);
-				}
-			}
-		}
-
-		// return (double) (res*(1/Math.pow(this.nrFaces, this.nrDice)));
-		return res;
-	}
-
-	
-
 	public long ProbaBranch(Integer[] goal) {
 
 		long res;
@@ -272,9 +176,8 @@ public class Throw { // this is wrong !!
 			goalSize += goal[i];
 		}
 
-		int extraDice = this.nrDice - goalSize; // TODO needs a safeguard
-												// somewhere, nrdice can not be
-												// bigger than goalsize
+		// TODO needs a safeguard somewhere, nrdice can not be bigger than goalsize
+		int extraDice = this.nrDice - goalSize; 
 
 		if (extraDice == 0) {
 
@@ -295,7 +198,7 @@ public class Throw { // this is wrong !!
 			return res;
 
 		} else { // if some dice do not have constraints, the proba of the goal
-					// is the sum of the probas of sll possibilities with those
+					// is the sum of the probas of all possibilities with those
 					// extra dice
 
 			Vector<Integer[]> sortedExtraDice = sortingExtraDice(extraDice);
@@ -314,19 +217,14 @@ public class Throw { // this is wrong !!
 
 	}
 
-	public long probaBranchOpitForRepetitions(Integer[] goal) { // TODO (when
-																// finished)
-																// check if that
-																// helps
+	public long probaBranchOpitForRepetitions(Integer[] goal) { 
+		// TODO (when finished) check if that helps
 
 		for (StackWithProba stack : this.stacksWithProbas) {
 			if (hasStack(goal, stack.stacks)) {
-				// System.out.println("using saved stacks with proba : (saved probas : "
-				// + this.stacksWithProbas.size() + ")");
 				return stack.favourableCases;
 			}
 		}
-
 		// System.out.println("calculating new : ");
 		long favourableCases = ProbaBranch(goal);
 		addToStacksWithProbas(goal, favourableCases);
@@ -354,27 +252,6 @@ public class Throw { // this is wrong !!
 
 	}
 
-//	private void removeBigChildren(WishTree developpedNormalisedTree) { 
-//		Vector<WishTree> toRemove = new Vector<WishTree>();// supresses children
-//															// that have more
-//															// numbers than
-//															// this.nrDice
-//		for (WishTree child : developpedNormalisedTree.getChildren()) {
-//			if (developpedNormalisedTree.isAND() && child.getChildren().size() > this.nrDice) {
-//				toRemove.add(child);
-//			}
-//		}
-//		developpedNormalisedTree.getChildren().removeAll(toRemove);
-//
-//		if (toRemove.size() > 0) {
-//			System.out
-//					.println("removed AND children that were too big. new tree : ");
-//			System.out.println(developpedNormalisedTree.toString());
-//		}
-//
-//	}
-	
-	
 	private void removeBigValues(WishTree developpedNormalisedTree){ 
 		Vector<WishTree> toRemove = new Vector<WishTree>();
 		
@@ -494,50 +371,6 @@ public class Throw { // this is wrong !!
 		return goal1;
 	}
 
-	private boolean areSimilar(Integer[] goal1, Integer[] goal2) { // TODO check
-																	// if
-																	// goal[i]
-																	// can be
-																	// null or
-																	// if it's
-																	// initialised
-																	// to 0
-		Integer[] stacks1 = new Integer[this.nrFaces];
-		for (int i = 0; i < this.nrFaces; i++) {
-			stacks1[i] = 0;
-		}
-		Integer[] stacks2 = new Integer[this.nrFaces];
-		for (int i = 0; i < this.nrFaces; i++) {
-			stacks2[i] = 0;
-		}
-
-		for (int i = 0; i < this.nrFaces; i++) {
-			for (int j = 0; j < this.nrFaces; j++) {
-				if (goal1[j] == i) { // (goal1[j] == null && i == 0 ) ||
-					stacks1[i]++;
-				}
-			}
-		}
-
-		for (int i = 0; i < this.nrFaces; i++) {
-			for (int j = 0; j < this.nrFaces; j++) {
-				if (goal2[j] == i) { // (goal1[j] == null && i == 0 ) ||
-					stacks2[i]++;
-				}
-			}
-		}
-
-		boolean res = true;
-
-		for (int i = 0; i < this.nrFaces; i++) {
-			if (stacks1[i] != stacks2[i]) {
-				res = false;
-			}
-		}
-
-		return res;
-	}
-
 	private boolean hasStack(Integer[] goal, Integer[] stack) {
 		Integer[] stacks1 = new Integer[this.nrFaces];
 		for (int i = 0; i < this.nrFaces; i++) {
@@ -566,21 +399,6 @@ public class Throw { // this is wrong !!
 
 	// ------------------------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------------------------
-
-	private List<WishTree> childrenToIntersectBinRep(long binRepres,
-			WishTree tree) {
-		List<WishTree> res = new Vector<WishTree>();
-
-		int k = 0;
-		while (Math.pow(2, k) <= binRepres * 2) { // TODO check border cases
-			if (getBit(binRepres, k) == 1) {
-				res.add(tree.getChildren().get(k));
-			}
-			k++;
-		}
-
-		return res;
-	}
 
 	private List<WishTree> childrenToIntersectArray(Integer[] intersection,
 			WishTree tree) {
@@ -645,14 +463,6 @@ public class Throw { // this is wrong !!
 			return res;
 		}
 
-	}
-
-	long getBit(long n, int k) { // return the kth bit of the number n
-		if (k > Integer.toBinaryString((int) n).length()) {
-			System.out.println("ERROR the number " + n + "has less than " + k
-					+ "bits");
-		}
-		return (n >> k) & 1;
 	}
 
 	public String goalToString(Integer[] goal) {
