@@ -7,7 +7,7 @@ this calculates the probabilits of you getting at least one of your wishes when 
 
 you can change the number of faces and dice with the corresponding "+1" and "-1" buttons. 
 
-you can write your wish in text (see syntax) and import it with the "import user string" button
+you can write your wish in text (see syntax) and import it with the "import" button. it will create a tree that correspond to the text you wrote.
 
 you can modify the displayed Wish tree by left clicking on the node you want to change (nedeed!) and then right clicking and following the menu. 
 
@@ -32,17 +32,17 @@ if you want THING1 and THING2 and THING3, it's quite confortable for the compute
 if you want any of these things, tell the computer "the next things that come, I want at least one of them" which would be "OR", and then the things in question. So : 
 (OR;THING1;THING2;THING3)
  
- and the things you want, they could be faces, like "I want a 1 or a 5" so (OR;1;5), or more complex things. Which is the whole point : you want to be able to replace the THINGS with complex wishes in order to combine them and write for example "full house" in a way that the computer can understand.
+ and the things you want, they could be faces, like "I want a 1 or a 5" so (OR;1;5), or more complex things. Which is the whole point : you want to be able to replace the THINGS with complex wishes in order to combine them and write for example "full house" in a way that the computer can understand, like (AND;pair;ntupel3). see presets.
  
 
 1-example
 
 let's say you want to calculate the probability of you getting a pair. You already selected 4 dice which are 6 sided. 
 
-so you want a 1 and a 1, or a 2 and a 2, or a 3 and a 3, or a 4 and a 4. 
+so you want a 1 and a 1, or a 2 and a 2, or a 3 and a 3, or a 4 and a 4, or a 5 and a 5, or a 6 and a 6. 
 
 you would write this: 
-(OR;(AND;1;1);(AND;2;2);(AND;3;3);AND(4;4))
+(OR;(AND;1;1);(AND;2;2);(AND;3;3);AND(4;4);(AND;5;5);(AND;6;6))
 which would be displayed like following : 
 OR
 --AND
@@ -57,10 +57,16 @@ OR
 --AND
 ----4
 ----4
+--AND
+----5
+----5
+--AND
+----6
+----6
 
 2-presets
 
-There are also some presets. for the example above, if you already selected 4 6-sided dice, you can just imput "pair", the program is goint to interpret it and construct the tree.
+There are also some presets. for the example above, if you already selected 4 6-sided dice, you can just imput "pair", the program is going to interpret it and construct the tree.
 Avilable presets are : 
 
 pair : two identical dice, 
@@ -69,12 +75,20 @@ full house : a pair and a triple,
 
 n-tupel : written ntupelX with X between 3 and number of dice, it means X identical dice,
 
-street : dice in a following order. if number of dice is smaller as number of faces, gives all possible street with this number of dice.
+street : dice in a following order. if number of dice is smaller as number of faces, gives a tree that means : "any possible street with this number of dice".
 
 all dice have a certain value : written allthesameX with X the wanted value. 
 
 tenthousand : anything valid for the game 10 000 (1 or 5 or triple or triple pair or street)
 
 
+3-superfluous cases
+
+lets say for instance that you want a pair or a triple. this program will calculate the probability that you have at least one of your wishes. but if you have a triple, it means that you already have a pair. 
+so (OR;pair;ntupel3) will give you the same answer than (OR;pair).
+
+4-invalid input
+
+in case you clic "import" with an invalid string, the program will try some basic fixes to interpret the text. if it cann' fix it, it will interpret it as empty. most if not all cases are covered. a subtree containing no semicolon (";") might still crash the prrogram (null pointer or array out of bounds). if you find any other, sorry and please tell me!
 
 
