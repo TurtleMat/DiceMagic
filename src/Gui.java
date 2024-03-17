@@ -1,5 +1,9 @@
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import javax.swing.JButton;
@@ -11,16 +15,20 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+
+
 
 public class Gui extends JFrame{
 	
 	final int MAX_NR_FACES = 50;
 	final int MAX_NR_DICE = 12;
 	
-	JFrame mainFrame = new JFrame("Dice Magic");  
+	JFrame singleThrowFrame = new JFrame("Dice Magic");  
 
 	JLabel nrDiceUserText = new JLabel("number of dice");
 	JLabel nrDiceLabel = new JLabel();
@@ -40,9 +48,9 @@ public class Gui extends JFrame{
 	JLabel currentTreeLabel = new JLabel("current Wish :");
 		
 	JTree displayTree = new JTree();
-	JScrollPane scrollPanel =new JScrollPane();
+	JScrollPane displayTreeScrollPanel =new JScrollPane();
 	JPopupMenu popup = new JPopupMenu();
-	
+
 	JButton clearTree = new JButton("clear");
 	JButton calculate = new JButton("Calculate");
 	JButton close = new JButton("Close");
@@ -53,6 +61,9 @@ public class Gui extends JFrame{
 	JPopupMenu nodeEditMenu;
 	JMenu addChildMenu, changeToMenu;
 	JMenuItem remove;
+	
+	
+
 	ActionListener popupMenuAddActionListener = new ActionListener() {
 		
 		public void actionPerformed(ActionEvent arg0) {
@@ -71,29 +82,15 @@ public class Gui extends JFrame{
 	// ------------------------------------------------------------------------------------------------------------------------------------
 	
 	public Gui(){
-		this.mainFrame.setSize(1200, 2000);
-		this.mainFrame.setLayout(null);
-		this.mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		scrollPanel.setViewportView(this.displayTree);
-		this.mainFrame.setVisible(true); // this seems to break jalbel result bounds.
+		this.singleThrowFrame.setSize(1200, 2000);
+		this.singleThrowFrame.setLayout(null);
+		this.singleThrowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		displayTreeScrollPanel.setViewportView(this.displayTree);
+		this.singleThrowFrame.setVisible(true); // this seems to break jalbel result bounds.
 	
 	}
 	
 	// ------------------------------------------------------------------------------------------------------------------------------------
-
-	public static void main(String[] args) {
-		
-		Gui Gui1 = new Gui();
-		
-		//This was in constructor. test if it breaks.
-		Gui1.setBounds(); 
-		Gui1.addToMainframe();
-		Gui1.initialise();
-		Gui1.createContextMenu();
-		Gui1.setupActionListeners();
-		
-	}  
-	
 	// ------------------------------------------------------------------------------------------------------------------------------------
 
 	private void setupClicableMenuItems(String label, JMenu addMenu, JMenu changeMenu){
@@ -108,7 +105,7 @@ public class Gui extends JFrame{
 		tmp.addActionListener(popupMenuChangeActionListener);		
 	}
 	
-	private void createContextMenu(){
+	public void createContextMenu(){
 
 		nodeEditMenu = this.popup;
 		this.displayTree.setComponentPopupMenu(popup);
@@ -170,44 +167,47 @@ public class Gui extends JFrame{
 		}
 	}
 
-	private void initialise() {
+	public void initialise() {
 		this.nrDiceLabel.setText("6");
 		this.nrFacesLabel.setText("6");
 		this.importStringTextField.setText("(OR;(AND;1;2;3;4;5;6))");
 		this.importUserString(this.importStringTextField.getText());
+		this.displayTree.setEditable(false);
 		
 		
 	}
 
-	private void addToMainframe() {
-		this.mainFrame.add(close);
+	public void addToMainframe() {
+		this.singleThrowFrame.add(close);
 		
-		this.mainFrame.add(nrDiceUserText);
-		this.mainFrame.add(nrDiceLabel);
-		this.mainFrame.add(increaseDice);
-		this.mainFrame.add(decreaseDice);
+		this.singleThrowFrame.add(nrDiceUserText);
+		this.singleThrowFrame.add(nrDiceLabel);
+		this.singleThrowFrame.add(increaseDice);
+		this.singleThrowFrame.add(decreaseDice);
 		
-		this.mainFrame.add(nrFacesUserText);
-		this.mainFrame.add(nrFacesLabel);
-		this.mainFrame.add(increaseFaces);
-		this.mainFrame.add(decreaseFaces);
+		this.singleThrowFrame.add(nrFacesUserText);
+		this.singleThrowFrame.add(nrFacesLabel);
+		this.singleThrowFrame.add(increaseFaces);
+		this.singleThrowFrame.add(decreaseFaces);
 		
-		this.mainFrame.add(imporsStringButton);
-		this.mainFrame.add(importStringTextField);
-		this.mainFrame.add(importStringLabel);
+		this.singleThrowFrame.add(imporsStringButton);
+		this.singleThrowFrame.add(importStringTextField);
+		this.singleThrowFrame.add(importStringLabel);
 		
-		this.mainFrame.add(scrollPanel);
-		this.mainFrame.add(currentTreeLabel);
+		this.singleThrowFrame.add(displayTreeScrollPanel);
+		this.singleThrowFrame.add(currentTreeLabel);
+		
+//		this.singleThrowFrame.add(consoleOutput);
 
-		this.mainFrame.add(clearTree);
+		this.singleThrowFrame.add(clearTree);
 		
-		this.mainFrame.add(calculate);
-		this.mainFrame.add(resultLabel);
-		this.mainFrame.add(result);
+		this.singleThrowFrame.add(calculate);
+		this.singleThrowFrame.add(resultLabel);
+		this.singleThrowFrame.add(result);
 		
 	}
 
-	private void setBounds(){
+	public void setBounds(){
 		
 		int shiftDown = 50;
 		int labelWidth = 150;
@@ -280,10 +280,15 @@ public class Gui extends JFrame{
 				labelWidth, 
 				labelHeight);
 
-		this.scrollPanel.setBounds(margin, 
+		this.displayTreeScrollPanel.setBounds(margin, 
 				labelHeight*3+margin*4+shiftDown, 
 				labelWidth*3, 
 				600);
+		
+//		this.consoleOutput.setBounds(margin*2 + labelWidth*3,
+//				labelHeight*3+margin*4+shiftDown,
+//				labelWidth*3,
+//				600);
 
 		this.calculate.setBounds(margin, 
 				600+labelHeight*3+margin*5+shiftDown, 
@@ -302,7 +307,7 @@ public class Gui extends JFrame{
 	
 	// ------------------------------------------------------------------------------------------------------------------------------------
 
-	private void setupActionListeners() {
+	public void setupActionListeners() {
 		
 		increaseFaces.addActionListener(new ActionListener() {
 			
@@ -347,7 +352,7 @@ public class Gui extends JFrame{
 
 		close.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mainFrame.dispose();
+				singleThrowFrame.dispose();
 			}
 		});
 		
@@ -357,7 +362,40 @@ public class Gui extends JFrame{
 				
 			}
 		});
+		
+		displayTree.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
 
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent me) {
+
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent me) {
+
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent me) {
+				int selRow = displayTree.getRowForLocation(me.getX(), me.getY());
+				TreePath selecPath = displayTree.getPathForLocation(me.getX(), me.getY());
+				displayTree.setSelectionPath(selecPath);
+				popup.setVisible(true);
+				
+			}
+		});
 
 		clearTree.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -374,13 +412,13 @@ public class Gui extends JFrame{
 		
 
 		
-		addChildMenu.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent arg0) {
-				result.setText(arg0.toString());
-				
-			}
-		});
+//		addChildMenu.addActionListener(new ActionListener() {
+//			
+//			public void actionPerformed(ActionEvent arg0) {
+//				result.setText(arg0.toString());
+//				
+//			}
+//		});
 		
 		remove.addActionListener(new ActionListener() {
 			
@@ -445,7 +483,7 @@ public class Gui extends JFrame{
 			this.displayTree = new JTree(root) ;
 			
 			this.displayTree.setEditable(true);
-			scrollPanel.setViewportView(this.displayTree);
+			displayTreeScrollPanel.setViewportView(this.displayTree);
 			this.expandDisplayTree(displayTree);
 			this.displayTree.setComponentPopupMenu(popup);
 			TreePath rootPath = new TreePath(root.getPath());
@@ -537,7 +575,7 @@ public class Gui extends JFrame{
 	protected void clearUserTree() {
 		this.currentTree= null;
 		this.displayTree = null;
-		scrollPanel.setViewportView(displayTree);
+		displayTreeScrollPanel.setViewportView(displayTree);
 	}
 	
 	protected void calculateUserProba() {
@@ -579,9 +617,9 @@ public class Gui extends JFrame{
 		WishTree tree = WishTree.prepareTree(currentTree, true, nrDice);
 		if (currentTree != null){
 
-			Throw currentThrow = new Throw(tree, nrDice, nrFaces); // TODO seems to be a pb if a goal contains a number  bigger than nrfaces
-			double res = (double) currentThrow.probaCompleteRec(tree) / Math.pow(nrFaces, nrDice);
-			this.result.setText(""+res);
+			CalculationsForSingleThrow currentThrow = new CalculationsForSingleThrow(tree, nrDice, nrFaces); // TODO seems to be a pb if a goal contains a number  bigger than nrfaces
+			double res = (double) currentThrow.probaCompleteRec(tree)[0] ;
+			this.result.setText(""+res/ Math.pow(nrFaces, nrDice));
 		}
 
 		
@@ -680,4 +718,22 @@ public class Gui extends JFrame{
 
 }
 	
-	
+//class PopupListener extends MouseAdapter {
+//public void mousePressed(MouseEvent e) {
+//    maybeShowPopup(e);
+//}
+//
+//public void mouseReleased(MouseEvent e) {
+//    maybeShowPopup(e);
+//}
+//
+//private void maybeShowPopup(MouseEvent e) {
+//	Component toSelect = displayTreeScrollPanel.getComponentAt(e.getX(), e.getY());
+//	toSelect.getp
+//	displayTree.setse
+//    if (e.isPopupTrigger()) {
+//    	nodeEditMenu.show(e.getComponent(), e.getX(), e.getY());
+//    }
+//}
+//}
+//
