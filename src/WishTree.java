@@ -6,16 +6,21 @@ import javax.swing.tree.TreePath;
 
 public class WishTree {
 
-	private static String[] availablePresets = new String[] { "pair", "ntupel",
-			"street", "tenthousand", "fullhouse", "allthesame" }; // ,"partialstreet"
+	private static String[] availableSimplePresets = new String[] { "pair",
+			"street", "tenthousand", "fullhouse" }; // ,"partialstreet"
 
+	private static String[] availableAdvancedPresets = new String[] { "ntupel",
+			"allthesame" };
+	
+	private boolean PRESET;
 	private boolean AND;
 	private boolean OR;
 	private boolean NR;
 	private List<WishTree> children;
-
+	
+	private String preset;
 	private int number;
-	private int gain = 1;
+	private int gain =0;
 	private boolean fixable = true;
 
 	public WishTree() {
@@ -34,7 +39,8 @@ public class WishTree {
 				i = Integer.parseInt(nodeString);
 				this.setValue(false, false, true, i);
 			} catch (NumberFormatException e) {
-				this.setValue(false, false, false, -2);
+				
+				this.setValue(nodeString);
 			}
 		}
 	}
@@ -44,12 +50,20 @@ public class WishTree {
 		this.setValue(false, false, true, i);
 		this.children = null;
 	}
-
+	
 	private void setValue(boolean AND, boolean OR, boolean NR, int i) {
 		this.AND = AND;
 		this.OR = OR;
 		this.NR = NR;
 		this.number = i;
+	}
+	private void setValue(String preset) {
+		this.AND = false;
+		this.OR = false;
+		this.NR = false;
+		this.number = -1;
+		this.PRESET = true;
+		this.preset = preset;
 	}
 
 	public WishTree(boolean AND, boolean OR) {
@@ -87,25 +101,24 @@ public class WishTree {
 	// ------------------------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------------------------
 
-	public static WishTree importAndPrepareTree(String encodingString,
-			int nrFaces, int nrDice, boolean verbose) {
+	public static WishTree importAndPrepareTree(String encodingString, int nrFaces, int nrDice, boolean verbose, Rules ruleset) {
+		
+		Main.say("tree import...", true, verbose, false);
+		
 		String firstTestResult = firstTest(encodingString);
 		if (firstTestResult == "") {
 			return null;
 		}
-		WishTree tree = WishTree.validStringToTree(firstTestResult, nrFaces,
-				nrDice);
+		WishTree tree = WishTree.validStringToTree(firstTestResult, nrFaces, nrDice);
 		if (tree == null) {
 			return null;
 		}
-		if (verbose) {
-			System.out.println("tree import...");
-			System.out.println(tree.toString());
-			System.out.println("tree imported.");
-			System.out.println("");
-		}
+		Main.say(tree.toString(), false, verbose, false);
+		Main.say("tree imported.", true, verbose, false);
+		Main.say("", true, verbose, false);
 
-		prepareTree(tree, verbose, nrDice);
+
+		prepareTree(tree, verbose, nrDice, nrFaces, ruleset);
 
 		return tree;
 
@@ -118,8 +131,8 @@ public class WishTree {
 		if (!(res.charAt(i) == '(')) {
 			System.out
 					.println("this should start with a parehthesis. please use following format : ");
-			System.out.println("(OPERATOR;TREE;...;TREE)");
-			System.out.println("adding a parenthesis and trying to proceed.");
+			Main.say("(OPERATOR;TREE;...;TREE)");
+			Main.say("adding a parenthesis and trying to proceed.");
 			res = "(" + res;
 		}
 
@@ -138,7 +151,7 @@ public class WishTree {
 					nrParenthesis--;
 					System.out
 							.println("you cann't have several opening parenthesis in a raw. please use following format : ");
-					System.out.println("(OPERATOR;TREE;...;TREE)");
+					Main.say("(OPERATOR;TREE;...;TREE)");
 					System.out
 							.println("removing a parenthesis and trying to proceed.");
 				}
@@ -152,8 +165,8 @@ public class WishTree {
 		if (!containsSemicolon) {
 			System.out
 					.println("this does not contain any semicolon (;). please use following format : ");
-			System.out.println("(OPERATOR;TREE;...;TREE)");
-			System.out.println("cann't fix that (yet?). Aborting.");
+			Main.say("(OPERATOR;TREE;...;TREE)");
+			Main.say("cann't fix that (yet?). Aborting.");
 			return "";
 		}
 
@@ -170,8 +183,8 @@ public class WishTree {
 		if (!(res.charAt(i) == ')')) {
 			System.out
 					.println("this should end with a parehthesis. please use following format : ");
-			System.out.println("(OPERATOR;TREE;...;TREE)");
-			System.out.println("adding a parenthesis and trying to proceed.");
+			Main.say("(OPERATOR;TREE;...;TREE)");
+			Main.say("adding a parenthesis and trying to proceed.");
 			res = res + ")";
 		}
 
@@ -254,7 +267,7 @@ public class WishTree {
 			if (resTree != null) {
 				// return resTree;
 			} else {
-				System.out.println("this leaf (" + encodingString
+				Main.say("this leaf (" + encodingString
 						+ ") is not an integer or a valid preset. removed.");
 				// return null;
 			}
@@ -286,8 +299,8 @@ public class WishTree {
 
 			int j = encodingString.indexOf(";", i);
 			if (j == -1) {
-				System.out.println("this (sub-)Tree :" + encodingString + " is invalid. Removing it.");
-				System.out.println("possible mistake : leaves don't use parenthesis, or you forgot a ';'");
+				Main.say("this (sub-)Tree :" + encodingString + " is invalid. Removing it.");
+				Main.say("possible mistake : leaves don't use parenthesis, or you forgot a ';'");
 				return null;
 			}
 
@@ -298,7 +311,7 @@ public class WishTree {
 				try {
 					branchGain = Integer.parseInt(encodingString.substring(k + 1, j));
 				} catch (final NumberFormatException e) {
-					System.out.println("syntax says there is a gain but is invalid");
+					Main.say("syntax says there is a gain but is invalid");
 				}
 			} else {
 				operator = encodingString.substring(i, j); 
@@ -346,7 +359,7 @@ public class WishTree {
 			} else if (operator.equalsIgnoreCase("OR")) {
 				newTree.setValue(false, true, false, -1);
 			} else {
-				System.out.println("invalid operator (" + operator
+				Main.say("invalid operator (" + operator
 						+ "). removing it and its children");
 				return null;
 			}
@@ -366,12 +379,12 @@ public class WishTree {
 		}
 	}
 
-	public static WishTree prepareTree(WishTree tree, boolean verbose,
-			int nrDice) { // should be void or not have tree as argument?
+	public static WishTree prepareTree(WishTree tree, boolean verbose, int nrDice, int nrFaces, Rules ruleset) { 
+		// should be void or not have tree as argument?
 
 		if (verbose) {
-			System.out.println("imput tree : ");
-			System.out.println(tree.toString());
+			Main.say("imput tree : ");
+			Main.say(tree.toString());
 		}
 
 		boolean fixable = tree.checkAndRepairTree();
@@ -379,68 +392,145 @@ public class WishTree {
 			System.out
 					.println("checking and reparing tree if possible/necessary...");
 			if (fixable) {
-				System.out.println(tree.toString());
-				System.out.println("tree is valid and repaired");
+				Main.say(tree.toString());
+				Main.say("tree is valid and repaired");
 			} else {
-				System.out.println("Tree is invalid. setting to null");
+				Main.say("Tree is invalid. setting to null");
 				return null;
 			}
 		}
 
-		// tree.calculateMinNrDiceForBranches_old();
-		// tree.suppressBigChildren(nrDice);
-		// if (verbose){
-		// System.out.println("calculating branches size and supressing impossible branches");
-		// System.out.println(tree.toString());
-		// System.out.println("removed.");
-		// System.out.println("");
-		//
-		// }
-
+		Main.say("removing operator without children...", true, verbose, false);
 		tree.removeOperatorLeaves();
-		if (verbose) {
-			System.out.println("removing operator without children...");
-			System.out.println(tree.toString());
-			System.out.println("removed.");
-			System.out.println("");
-		}
+		Main.say(tree.toString(), false, verbose, false);
+		Main.say("removed.", true, verbose, false);
+		Main.say("", true, verbose, false);
 
+		Main.say("simplifying tree...", true, verbose, false);
 		tree.collapseIdenticalFollowingOperators();
 		tree.tryRemovingBigAnd(nrDice);
-		if (verbose) {
-			System.out.println("simplifying tree...");
-			System.out.println(tree.toString());
-			System.out.println("tree simplified");
-			System.out.println("");
-		}
+		Main.say(tree.toString(), false, verbose, false);
+		Main.say("tree simplified", true, verbose, false);
+		Main.say("", true, verbose, false);
 
+		Main.say("developping tree...", true, verbose, false);
 		tree.developpTree(nrDice);
-		if (verbose) {
-			System.out.println("developping tree...");
-			System.out.println(tree.toString());
-			System.out.println("tree developped");
-		}
-
+		Main.say(tree.toString(), false, verbose, false);
+		Main.say("tree developped. Nr Branches :" + tree.getChildren().size() , true, verbose, false);
+		Main.say("", true, verbose, false);
+		
+		Main.say("normalising tree...", true, verbose, false);
 		tree.normaliseTerminalBranches();
-		if (verbose) {
-			System.out.println("normalising tree...");
-			System.out.println(tree.toString());
-			System.out.println("tree normalised");
+		Main.say(tree.toString(), false, verbose, false);
+		Main.say("tree normalised. Nr Branches :" + tree.getChildren().size(), true, verbose, false);
+		Main.say("", true, verbose, false);
+		
+		
+		if (ruleset != null && ruleset.isCanKeepMultipleGoalsPerThrow()) {
+			Main.say("adding cases for multiple goals and removing redundancies...", true, verbose, false);
+			tree.addBranchesForMultipleGoalAndRemoveRedundancies(tree, nrDice, nrFaces);
+			Main.say(tree.toString(), false, verbose, false);
+			Main.say("cases added. redundancies removed. Nr Branches :" + tree.getChildren().size(), true, verbose, false);
+			Main.say("", true, verbose, false);
+		} else {
+			Main.say("removing redundency...", true, verbose, false);
+			tree.removeUselessCases(ruleset, nrFaces);
+			Main.say(tree.toString(), false, verbose, false);
+			Main.say("redundencies removed. Nr Branches :" + tree.getChildren().size(), true, verbose, false);
+			Main.say("", true, verbose, false);
 		}
+		
+		
 
-		tree.removeRedundancy();
-		if (verbose) {
-			System.out.println("removing redundency...");
-			System.out.println(tree.toString());
-			System.out.println("redundencies removed");
-		}
 
 		return tree;
 
 	}
 
+	private void addBranchesForMultipleGoalAndRemoveRedundancies(WishTree tree, int nrDice, int nrFaces) {
+		Vector<WishTree> newChildrenWithDescendency = new Vector<WishTree>();
+		Vector<WishTree> toRemoveVect = new Vector<WishTree>();
+//		Vector<WishTree> multGoalsToAdd = new Vector<WishTree>();
+
+
+//		boolean keepChildA = true;
+		while (tree.getChildren() != null && tree.getChildren().size()!= 0) {
+			boolean keepChildA = true;
+			Main.say("new Children :" + newChildrenWithDescendency);
+			Main.say("tree : " +tree.toString());
+			WishTree childA = tree.getChildren().get(0); // sould gt the first element, don't forget to remove
+			for (WishTree newChild : newChildrenWithDescendency) {
+				WishTree toRemove = branchContainsWithGainReturnsToRemove(childA, newChild, nrFaces);
+				
+				if (toRemove == childA) {
+					keepChildA = false;
+				}
+				if (toRemove == newChild) {
+					toRemoveVect.add(newChild);
+				}
+				if (toRemove == null) {
+					WishTree newMultipleGoal = terminalBranchesSum(childA, newChild, nrDice);
+					tree.addChild(newMultipleGoal);
+					// WARNING here under the children have an other meaning. any AND child of a terminal branch is a sum containing them.
+					childA.addChild(newMultipleGoal); 
+					newChild.addChild(newMultipleGoal);
+				}
+			}
+			if (!toRemoveVect.isEmpty()) {
+				
+				for (WishTree toRemove : toRemoveVect) {
+					tree.getChildren().removeAll(toRemove.getChildren(true, false, false)); // these are the sums rendered useless
+					toRemove.setAllSumDescendentsToNull();//TODO see if setting to null is the same than deleting
+				}
+				
+				newChildrenWithDescendency.removeAll(toRemoveVect);
+				
+			}
+			if (keepChildA) {
+				newChildrenWithDescendency.add(childA);
+				WishTree newMultipleGoal = terminalBranchesSum(childA, childA, nrDice);
+				tree.addChild(newMultipleGoal);
+				// WARNING here under the children have an other meaning. any AND child of a terminal branch is a sum containing them.
+				childA.addChild(newMultipleGoal); 
+				
+			}
+			
+			tree.getChildren().remove(childA);
+		}
+		
+
+		this.resetChildren();
+		Vector<WishTree> newChildren = new Vector<WishTree>();
+		for (WishTree newChild : newChildrenWithDescendency) {
+			newChild.setChildren(newChild.getChildren(false,  false, true));
+			newChildren.add(newChild);
+		}
+		this.addChildren(newChildren);
+	}
+	
+	
+
+	private void setAllSumDescendentsToNull() {
+		for (WishTree sumChild : this.getChildren(true, false, false)) {
+			sumChild.setAllSumDescendentsToNull();
+			sumChild = null;
+		}
+		
+	}
+
+	private void removeUselessCases(Rules ruleset, int nrFaces) {
+
+		if (ruleset == null || !ruleset.isCanKeepMultipleGoalsPerThrow()) {//this test should be true if gain is not relevant. removeRedundancy breaks gain.
+			this.removeRedundancy();//might be obsolote, the new should work the same in the same cases
+		}else {
+			this.removeRedundancy_New(nrFaces);
+		}
+		
+	}
+
 	// ------------------------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------------------------
+
 
 	public boolean checkAndRepairTree() {
 		// this.checkAndRepairNode(null);
@@ -660,7 +750,7 @@ public class WishTree {
 
 				this.setToOr();
 				this.children = newChildren;
-				if (gain != 1) {
+				if (gain != 0) {
 					this.setGain(gain);
 				}
 			}
@@ -708,14 +798,85 @@ public class WishTree {
 	// ------------------------------------------------------------------------------------------------------------------------------------
 
 	
-	public void removeRedundancy_New() {
+	public void removeRedundancy_New(int nrFaces) {
+		Vector<WishTree> newChildren = new Vector<WishTree>();
+		Vector<WishTree> toRemoveVect = new Vector<WishTree>();
 
+		for (WishTree childA : this.getChildren()) {
+			boolean keepChildA = true;
+
+			for (WishTree newChild : newChildren) {
+				WishTree toRemove = branchContainsWithGainReturnsToRemove(childA, newChild, nrFaces); // if A in B returns 1; if Bin A returns 2, if A=B returns 0, otherwise -1
+				//TODO breaks if a goal contains a big number (>nrFace)
+				if (toRemove == childA) {
+					keepChildA = false;
+				}
+				if (toRemove == newChild){
+					toRemoveVect.add(toRemove);
+				}
+			}
+			if (!toRemoveVect.isEmpty()) {
+				newChildren.removeAll(toRemoveVect);
+			}
+			if (keepChildA) {
+				newChildren.add(childA);
+			}
+		}
+
+		this.resetChildren();
+		this.addChildren(newChildren);
 	}
 
-	public void removeRedundancy() { // removes branches that contains other
-										// branches. Ex : if there is a branch
-										// (AND;1) and a branch (AND;5;2;1) it
-										// will remove the latter
+	public WishTree branchContainsWithGainReturnsToRemove(WishTree branchA, WishTree branchB, int nrFaces) {
+		
+		Integer[] goalA = CalculationsForSingleThrow.terminalBranchToGoal(branchA, nrFaces);
+		int gainA = branchA.getGain();
+		Integer[] goalB = CalculationsForSingleThrow.terminalBranchToGoal(branchB, nrFaces);
+		int gainB = branchB.getGain();
+		Integer[] diff = new Integer[nrFaces];
+		int diffGain = gainA - gainB;
+		
+		boolean isBiggerBranchA = false;
+		boolean isBiggerBranchB = false;
+		
+//		diff[0] = goalA[0] - goalB[0]; //if diff >0 then B can not be bigger than A
+		
+		int i = 0;
+		boolean stillPossible = true;
+		while (stillPossible && i<nrFaces) {
+			diff[i] = goalA[i] - goalB[i];
+			if (diff[i] > 0) {
+				isBiggerBranchA = true;
+			}
+			if (diff[i] < 0) {
+				isBiggerBranchB = true;
+			} 
+			
+			stillPossible = !(isBiggerBranchA && isBiggerBranchB); //if diff has both positive and negative values, no branch is contained in the other
+			i++;
+		}
+		if (stillPossible) {
+			if (isBiggerBranchA && diffGain<=0) { // B in A and gainB>=gainA. should remove A
+				return branchA;
+			}
+			if (isBiggerBranchB && diffGain>=0) { // A in B and gainB<=gainA. should remove B
+				return branchB;
+			}
+			if (!isBiggerBranchA && ! isBiggerBranchB) { // A = B
+				if (diffGain<0) {//B has a better gain. remove A
+					return branchA;
+				}else {//A has a bigger gain or both branches are identical. remove B
+					return branchB;
+				}
+			}
+		}
+		return null;
+		
+	}
+	
+	public void removeRedundancy() { 
+		// removes branches that contains other branches. Ex : if there is a branch
+		// (AND;1) and a branch (AND;5;2;1) it will remove the latter
 		// there is no need for anyhting that contains a 1 (it will already be
 		// calculated)
 		Vector<WishTree> newChildren = new Vector<WishTree>();
@@ -725,7 +886,7 @@ public class WishTree {
 			boolean keepChildA = true;
 
 			for (WishTree newChild : newChildren) {
-				int test = branchContains(childA, newChild);
+				int test = branchContains(childA, newChild); // if A in B returns 1; if Bin A returns 2, if A=B returns 0, otherwise -1
 				if (test == 0 || test == 2) {
 					keepChildA = false;
 				}
@@ -744,14 +905,15 @@ public class WishTree {
 		this.resetChildren();
 		this.addChildren(newChildren);
 	}
+	
+
 
 	public int branchContains(WishTree branchA, WishTree branchB) {
-		// if A in B returns 1; if Bin A returns 2, if A=B returns 0, otherwise
-		// -1
+		// if A in B returns 1; if Bin A returns 2, if A=B returns 0, otherwise -1
 
-		if (branchA.getGain() != branchB.getGain()) {
-			return -1;
-		}
+//		if (branchA.getGain() != branchB.getGain()) {
+//			return -1;
+//		}
 
 		WishTree tempA = new WishTree();
 		WishTree tempB = new WishTree();
@@ -812,7 +974,7 @@ public class WishTree {
 			res += "| ";
 		}
 		res += this.nodeValueToString();
-		if (this.getGain() != 1) {
+		if (this.getGain() != 0) {
 			res += ":" + this.getGain();
 		}
 		res += "\n";
@@ -829,12 +991,19 @@ public class WishTree {
 		if (this.isNR()) {
 			return "" + number;
 		}
-		if (!(this.isAND() || this.isOR() || this.isNR())) {
+		if (this.isPRESET()) {
+			return "" + preset;
+		}
+		if (!(this.isAND() || this.isOR() || this.isNR() || this.isPRESET())) {
 			return "this node is crap";
 		}
 		return " you should never see this";
 
 	}
+
+//	public String toString() {
+//		
+//	}
 
 	public String toString() {
 		String res = "";
@@ -898,6 +1067,17 @@ public class WishTree {
 
 	}
 
+	public WishTree terminalBranchesSum(WishTree tree1, WishTree tree2, int nrDice) {
+		WishTree res = new WishTree(true, false);
+		res.getChildren().addAll(tree1.getChildren(false, false, true));
+		res.getChildren().addAll(tree2.getChildren(false, false, true));
+		res.setGain(tree1.getGain()+tree2.getGain());
+		if (res.getChildren(false, false, true).size()<nrDice) {
+			return res;
+		}else {
+			return null;
+		}
+	}
 	
 	public boolean scanChildren(WishTree tree, boolean AND, boolean OR,
 			boolean NR) { // scanns for children that have one of the TRUE
@@ -923,6 +1103,10 @@ public class WishTree {
 		return NR;
 	}
 
+	private boolean isPRESET() {
+		return this.PRESET;
+	}
+	
 	public void setToOr() {
 		this.AND = false;
 		this.OR = true;
@@ -941,25 +1125,21 @@ public class WishTree {
 
 	public void setGain(int gain) {
 		if (this.isAND()) {
-			if (this.getGain() != 1) {
-				System.out
-						.println("Warning, overriding a non 1 gain for branch :");
-				System.out.println(this.toString());
-				System.out.println("old gain : " + this.getGain()
-						+ ". New gain : " + gain + ".");
+			if (this.getGain() != 0) {
+				System.out.println("Warning, overriding a non 0 gain for branch :");
+				Main.say(this.toString());
+				Main.say("old gain : " + this.getGain() + ". New gain : " + gain + ".");
 			}
 			this.gain = gain;
 			for (WishTree child : this.getChildren()) {
-				child.setGain(1);
+				child.setGain(0);
 			}
 		}
 		if (this.isNR()) {
-			if (this.getGain() != 1) {
-				System.out
-						.println("Warning, overriding a non 1 gain for branch :");
-				System.out.println(this.toString());
-				System.out.println("old gain : " + this.getGain()
-						+ ". New gain : " + gain + ".");
+			if (this.getGain() != 0) {
+				System.out.println("Warning, overriding a non 0 gain for branch :");
+				Main.say(this.toString());
+				Main.say("old gain : " + this.getGain() + ". New gain : " + gain + ".");
 			}
 			this.gain = gain;
 		}
@@ -970,6 +1150,8 @@ public class WishTree {
 		}
 	}
 
+
+	
 	// ------------------------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1084,10 +1266,123 @@ public class WishTree {
 	}
 
 	public static String[] getAvailablePresets() {
+		int totalLenght = availableAdvancedPresets.length+availableSimplePresets.length;
+		String[] availablePresets =new String[totalLenght] ;
+		int i=0;
+		while (i<availableAdvancedPresets.length) {
+			availablePresets[i] = availableAdvancedPresets[i];
+			i++;
+		}
+		int j=0;
+		while (i<totalLenght) {
+			availablePresets[i] = availableSimplePresets[j];
+			i++;
+			j++;
+		}
 
 		return availablePresets;
+	}
+
+	public static String[] getAvailableSimplePresets() {
+		return availableSimplePresets;
+	}
+
+	public static String[] getAvailableAdvancedPresets() {
+		return availableAdvancedPresets;
+	}
+	
+	public boolean isLeaf() {
+		return false;
 	}
 
 	// ------------------------------------------------------------------------------------------------------------------------------------
 
 }
+
+
+//
+//private void addBranchesForMultipleGoal(WishTree tree, int nrDice) {
+//	int nrBranches = tree.getChildren().size();
+//	boolean[] currBranchesSum = new boolean[tree.getChildren().size()];
+//	currBranchesSum[0] = true;
+//	for (int i=1;i<nrBranches;i++) {
+//		currBranchesSum[i] = false;
+//	}
+//	
+//	Vector<WishTree> newBranches = new Vector<WishTree>();
+//	newBranches = branchSumsToAddRec(0, currBranchesSum, newBranches, tree, nrDice);
+//	tree.getChildren().addAll(newBranches);
+//}
+
+//
+//private Vector<WishTree>  branchSumsToAddRec(int recLevel, boolean[] currBranchesSum, Vector<WishTree> newBranchesToAdd,  WishTree tree, int nrDice) {
+//
+////	Integer[] currGoal = intersectionToGoal(currIntersec, tree);
+//	WishTree newBranch = new WishTree(true, false);
+//	int gain = 0;
+//	for (int i=0;i<currBranchesSum.length;i++) {
+//		if (currBranchesSum[i]) {
+//			WishTree currBranch = tree.getChildren().get(i);
+//			
+//			newBranch.getChildren().addAll(currBranch.Clone().getChildren());
+//			gain += tree.getChildren().get(i).getGain();
+//		}
+//	}
+//	newBranch.setGain(gain);
+//	
+//	boolean sumIsNotNull= (newBranch.getChildren().size()<=nrDice);
+//	int nrBranch = tree.getChildren().size();
+//	boolean lastDigit = (recLevel == tree.getChildren().size() -1);
+//	if (lastDigit) {
+//		System.out.println("this is a breakpoint");
+//	}
+//	System.out.println("rec level : " + recLevel);
+//	
+//	if (sumIsNotNull && !lastDigit) {//2024-03 modification
+//		
+////		pairProbaExpect = calculateOneIntersection(currIntersec, pairProbaExpect, tree, currGoal, recLevel);
+//		newBranchesToAdd.add(newBranch);
+//		
+////		currIntersec[recLevel + 1]++;
+//		currBranchesSum[recLevel + 1]= true;
+//		newBranchesToAdd = branchSumsToAddRec(recLevel + 1, currBranchesSum, newBranchesToAdd, tree, nrDice);
+//	}
+//
+//	if (sumIsNotNull && lastDigit) {
+//
+////		pairProbaExpect = calculateOneIntersection(currIntersec, pairProbaExpect, tree, currGoal, recLevel);
+//		newBranchesToAdd = branchSumsToAddRec(recLevel + 1, currBranchesSum, newBranchesToAdd, tree, nrDice);
+//		
+//		return newBranchesToAdd;
+//	}
+//	
+//	if (!sumIsNotNull && lastDigit) {
+//		return newBranchesToAdd;
+//	}
+//
+//	if (!currBranchesSum[recLevel]) {
+//		return newBranchesToAdd;
+//	}
+//	
+//	if (currBranchesSum[recLevel]) {
+//		currBranchesSum[recLevel] = false;
+//		currBranchesSum[recLevel + 1] = true;
+//		
+//		newBranchesToAdd = branchSumsToAddRec(recLevel + 1, currBranchesSum, newBranchesToAdd, tree, nrDice);
+//		
+//		currBranchesSum[recLevel + 1]= false;
+//		currBranchesSum[recLevel] = true;
+//	}
+//	
+////	if (currBranchesSum[recLevel] != 0 && currBranchesSum[recLevel] != 1) {
+////		Main.say("ERROR : currIntersec of anything should be 0 or 1");
+////	}
+////	
+////	if (!calculateIntersection && !lastDigit) {
+////		// currIntersec[recLevel] = 0;
+////		// return res;
+////	}
+//
+//	return newBranchesToAdd;
+//}
+

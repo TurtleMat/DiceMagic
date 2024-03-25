@@ -1,11 +1,10 @@
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collections;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -13,12 +12,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 
@@ -50,6 +49,9 @@ public class Gui extends JFrame{
 	JTree displayTree = new JTree();
 	JScrollPane displayTreeScrollPanel =new JScrollPane();
 	JPopupMenu popup = new JPopupMenu();
+	
+	JScrollPane consoleOutput = new JScrollPane();
+	JTextArea outputTextArea= new JTextArea();
 
 	JButton clearTree = new JButton("clear");
 	JButton calculate = new JButton("Calculate");
@@ -172,10 +174,12 @@ public class Gui extends JFrame{
 		this.nrFacesLabel.setText("6");
 		this.importStringTextField.setText("(OR;(AND;1;2;3;4;5;6))");
 		this.importUserString(this.importStringTextField.getText());
-		this.displayTree.setEditable(false);
-		
+		this.displayTree.setEditable(false);		
+		this.consoleOutput.setViewportView(this.outputTextArea);
 		
 	}
+
+
 
 	public void addToMainframe() {
 		this.singleThrowFrame.add(close);
@@ -197,7 +201,8 @@ public class Gui extends JFrame{
 		this.singleThrowFrame.add(displayTreeScrollPanel);
 		this.singleThrowFrame.add(currentTreeLabel);
 		
-//		this.singleThrowFrame.add(consoleOutput);
+		this.singleThrowFrame.add(outputTextArea);
+		this.singleThrowFrame.add(consoleOutput);
 
 		this.singleThrowFrame.add(clearTree);
 		
@@ -285,10 +290,10 @@ public class Gui extends JFrame{
 				labelWidth*3, 
 				600);
 		
-//		this.consoleOutput.setBounds(margin*2 + labelWidth*3,
-//				labelHeight*3+margin*4+shiftDown,
-//				labelWidth*3,
-//				600);
+		this.consoleOutput.setBounds(margin*2 + labelWidth*3,
+				labelHeight*3+margin*4+shiftDown,
+				labelWidth*3,
+				600);
 
 		this.calculate.setBounds(margin, 
 				600+labelHeight*3+margin*5+shiftDown, 
@@ -363,39 +368,39 @@ public class Gui extends JFrame{
 			}
 		});
 		
-		displayTree.addMouseListener(new MouseListener() {
-			
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-
-				
-			}
-			
-			@Override
-			public void mousePressed(MouseEvent me) {
-
-			}
-			
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseEntered(MouseEvent me) {
-
-			}
-			
-			@Override
-			public void mouseClicked(MouseEvent me) {
-				int selRow = displayTree.getRowForLocation(me.getX(), me.getY());
-				TreePath selecPath = displayTree.getPathForLocation(me.getX(), me.getY());
-				displayTree.setSelectionPath(selecPath);
-				popup.setVisible(true);
-				
-			}
-		});
+//		displayTree.addMouseListener(new MouseListener() {
+//			
+//			@Override
+//			public void mouseReleased(MouseEvent arg0) {
+//
+//				
+//			}
+//			
+//			@Override
+//			public void mousePressed(MouseEvent me) {
+//
+//			}
+//			
+//			@Override
+//			public void mouseExited(MouseEvent arg0) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//			
+//			@Override
+//			public void mouseEntered(MouseEvent me) {
+//
+//			}
+//			
+//			@Override
+//			public void mouseClicked(MouseEvent me) {
+//				int selRow = displayTree.getRowForLocation(me.getX(), me.getY());
+//				TreePath selecPath = displayTree.getPathForLocation(me.getX(), me.getY());
+//				displayTree.setSelectionPath(selecPath);
+//				popup.setVisible(true);
+//				
+//			}
+//		});
 
 		clearTree.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -474,10 +479,14 @@ public class Gui extends JFrame{
 	
 	protected void importUserString(String string) {
 		try {
+			
+			boolean alloyMultiplePatterns = true;
+			Rules ruleset = new Rules(alloyMultiplePatterns, false, false);
+			
 			int nrFaces = this.getNrFaces();
 			int nrDice = this.getNrDice();
 			
-			WishTree transitionTree = WishTree.importAndPrepareTree(string, nrFaces, nrDice, true);
+			WishTree transitionTree = WishTree.importAndPrepareTree(string, nrFaces, nrDice, true, ruleset);
 			DefaultMutableTreeNode root = wishTreeToDisplay(transitionTree);
 			
 			this.displayTree = new JTree(root) ;
@@ -580,6 +589,9 @@ public class Gui extends JFrame{
 	
 	protected void calculateUserProba() {
 		
+		boolean alloyMultiplePatterns = true;
+		Rules ruleset = new Rules(alloyMultiplePatterns, false, false);
+		
 		if (this.displayTree == null){
 			this.result.setText("there is currently no tree selected");
 			return;
@@ -614,7 +626,7 @@ public class Gui extends JFrame{
 		
 		
 		
-		WishTree tree = WishTree.prepareTree(currentTree, true, nrDice);
+		WishTree tree = WishTree.prepareTree(currentTree, true, nrDice, nrFaces, ruleset);
 		if (currentTree != null){
 
 			CalculationsForSingleThrow currentThrow = new CalculationsForSingleThrow(tree, nrDice, nrFaces); // TODO seems to be a pb if a goal contains a number  bigger than nrfaces
@@ -666,12 +678,12 @@ public class Gui extends JFrame{
 		expandDisplayNode(tree, node);
 	}
 
-	private void expandDisplayNode(JTree tree, DefaultMutableTreeNode node) {
-		ArrayList<DefaultMutableTreeNode> children = Collections.list(node.children());
-		for (DefaultMutableTreeNode child : children){
+	private void expandDisplayNode(JTree tree, TreeNode node) {
+		ArrayList<TreeNode> children = (ArrayList<TreeNode>) Collections.list(node.children());
+		for (TreeNode  child : children){
 			expandDisplayNode(tree, child);
 		}
-		TreePath path = new TreePath(node.getPath());
+		TreePath path = new TreePath(((DefaultMutableTreeNode) node).getPath());
 		tree.expandPath(path);
 	}
 
@@ -712,6 +724,14 @@ public class Gui extends JFrame{
 			this.popup = new JPopupMenu();
 			createContextMenu();
 		}
+	}
+	
+	private String getOutputString() {
+		return this.outputTextArea.getText();
+	}
+	
+	public void say(String toSay){
+		this.outputTextArea.append(toSay);
 	}
 	
 	// ------------------------------------------------------------------------------------------------------------------------------------

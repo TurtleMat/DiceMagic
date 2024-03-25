@@ -1,14 +1,19 @@
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
 import javax.lang.model.type.ArrayType;
 
+import org.junit.Rule;
+
 public class CalculationsForSingleThrow { // this is wrong !!
 
 	public int nrDice;
 	public int nrFaces;
 	public boolean verbose= true;
+	
+	public Rules ruleset = new Rules(true, false, false);
 
 	public WishTree wish;
 
@@ -43,20 +48,24 @@ public class CalculationsForSingleThrow { // this is wrong !!
 
 	public long[] probaCompleteRec(WishTree tree) {
 		if (verbose) {
-			System.out.println("starting to compute");
+			Main.say("starting to compute with following tree:");
+			Main.say(tree.toString());
 		}
 //		removeBigChildren(tree);
 		removeBigValues(tree);
-		if (verbose){
-			System.out.println("new tree :");
-			System.out.println(tree.toString());
-		}
+		
+		Main.say("new tree :", false, false, true);
+		Main.say(tree.toString(), false, false, true);
+		
 		
 		int nrBranch = tree.getChildren().size();
 		if (nrBranch == 0){
-			System.out.println("this tree has no branches. Probable cause : no wish was doable. setting probability to 0");
+			Main.say("this tree has no branches. Probable cause : no wish was doable. setting probability to 0");
 			return new long[] {0,0};
 		}
+		
+		
+		
 		Integer[] currIntersec = new Integer[nrBranch];
 		currIntersec[0] = 1;
 		for (int i = 1; i < nrBranch; i++) {
@@ -64,16 +73,54 @@ public class CalculationsForSingleThrow { // this is wrong !!
 		}
 		
 		long[] pairProbaExpect = new long[] {0,0};
+		
 		pairProbaExpect = probaCompleteNextIntersectionRec(0, currIntersec, pairProbaExpect, tree);
-
+		
+//		sortTerminalBranchesAscendingDiceUsed(tree);
+//		probaCompleteNextIntersectionRec_NewAssumeSortedBranches(0, currIntersec, pairProbaExpect, tree);
+		
+//		pairProbaExpect[0] = pairProbaExpect[0] / Math.pow(nrFaces, nrDice));
+//		pairProbaExpect[1] = pairProbaExpect[1] / Math.pow(nrFaces, nrDice));
+		Main.say("-----------------------------------------------------------------------------");
+		Main.say("the probability is " + pairProbaExpect[0]/ Math.pow(nrFaces, nrDice));
+		Main.say("the expectancy for greedy strategy is : "+pairProbaExpect[1]/ Math.pow(nrFaces, nrDice));
+		Main.say("-----------------------------------------------------------------------------");
+		
 		return pairProbaExpect;
 	}
 
-	private long[] probaCompleteNextIntersectionRec(int recLevel, Integer[] currIntersec, long[] pairProbaExpect,  WishTree tree) {
-
+	private WishTree sortTerminalBranchesAscendingDiceUsed(WishTree treeToSort) {
+		//lazy for now. TODO later : reasonable sort
+		int nrBranches = treeToSort.getChildren().size();
+		Vector<WishTree> sortedChildren = new Vector<>();
+		
+		int i = 0;
+		while (treeToSort.getChildren() != null && treeToSort.getChildren().size()!= 0) {
+			
+			WishTree nextToAdd = treeToSort.getChildren().get(0);
+			int currNrDice = nextToAdd.getChildren().size();
+			for (WishTree child : treeToSort.getChildren()) {
+				if (child.getChildren().size()	< currNrDice) {
+					nextToAdd = child;
+					currNrDice = child.getChildren().size();
+				}
+			}
+			treeToSort.getChildren().remove(nextToAdd);
+			sortedChildren.add(nextToAdd);
+		}
+		treeToSort.resetChildren();
+		treeToSort.addChildren(sortedChildren);
+		Main.say("Sorted Tree : ");
+		Main.say(treeToSort.toString());
+		return treeToSort;
+	}
+	
+	private long[] probaCompleteNextIntersectionRec_NewAssumeSortedBranches(int recLevel, Integer[] currIntersec, long[] pairProbaExpect,  WishTree tree) {
+		//TODO wrong because the intersections take the max and not the sum of each face.
 		Integer[] currGoal = intersectionToGoal(currIntersec, tree);
 		boolean intersectionIsNotNull;
 		intersectionIsNotNull = !(currGoal == null);
+
 		boolean lastDigit = (recLevel == tree.getChildren().size() - 1);
 		
 		if (intersectionIsNotNull && !lastDigit) {//2024-03 modification
@@ -110,7 +157,68 @@ public class CalculationsForSingleThrow { // this is wrong !!
 		}
 		
 		if (currIntersec[recLevel] != 0 && currIntersec[recLevel] != 1) {
-			System.out.println("ERROR : currIntersec of anything should be 0 or 1");
+			Main.say("ERROR : currIntersec of anything should be 0 or 1");
+		}
+//		
+//		if (!calculateIntersection && !lastDigit) {
+//			// currIntersec[recLevel] = 0;
+//			// return res;
+//		}
+
+		return pairProbaExpect;
+	}
+	
+	private long[] probaCompleteNextIntersectionRec(int recLevel, Integer[] currIntersec, long[] pairProbaExpect,  WishTree tree) {
+
+		Integer[] currGoal = intersectionToGoal(currIntersec, tree);
+		boolean intersectionIsValid;
+		intersectionIsValid = !(currGoal == null);
+
+		boolean lastDigit = (recLevel == tree.getChildren().size() - 1);
+		
+		if (intersectionIsValid && !lastDigit) {//2024-03 modification
+			
+			
+			pairProbaExpect = calculateOneIntersection(currIntersec, pairProbaExpect, tree, currGoal, recLevel);
+			
+			currIntersec[recLevel + 1]++;
+			pairProbaExpect = probaCompleteNextIntersectionRec(recLevel + 1, currIntersec, pairProbaExpect, tree);
+		}
+
+		if (intersectionIsValid&& lastDigit ) {//
+
+			pairProbaExpect = calculateOneIntersection(currIntersec, pairProbaExpect, tree, currGoal, recLevel);
+			
+			return pairProbaExpect;
+		}
+		
+		if (!intersectionIsValid && lastDigit) {//
+			return pairProbaExpect;
+		}
+
+		if (currIntersec[recLevel] == 0) {
+			return pairProbaExpect;
+		}
+		
+		
+		if (currIntersec[recLevel] == 1) {
+//			if (intersectionIsTooBig) {
+//				
+//			}else {
+				currIntersec[recLevel] = 0;
+				currIntersec[recLevel + 1] = 1;
+				
+				pairProbaExpect = probaCompleteNextIntersectionRec(recLevel + 1, currIntersec, pairProbaExpect, tree);
+				
+				currIntersec[recLevel + 1]--;
+				currIntersec[recLevel]++;
+//			}
+			
+			
+		}
+		
+		if (currIntersec[recLevel] != 0 && currIntersec[recLevel] != 1) {
+			Main.say("ERROR : currIntersec of anything should be 0 or 1");
 		}
 //		
 //		if (!calculateIntersection && !lastDigit) {
@@ -130,29 +238,22 @@ public class CalculationsForSingleThrow { // this is wrong !!
 		pairProbaExpect[0] += toAdd;
 		pairProbaExpect[1] += toAdd*gainForIntersection;
 		
-		System.out.println();
-		System.out.println("current intersection : " + intArrayToString(currIntersec) + ". Rec level : "+ recLevel);
-		System.out.println("current goal : " +intArrayToString(currGoal));
-		System.out.println("--Adding " + (double) toAdd / Math.pow(this.nrFaces, this.nrDice) + " to the proba (" + toAdd + " favourable cases)");
-		System.out.println("--Multiplying with Gain (" + gainForIntersection + ", greedy stragety) : adding " + toAdd*gainForIntersection  / Math.pow(this.nrFaces, this.nrDice) + " to the expectancy");
+		Main.say("");
+		Main.say("current intersection : " + intArrayToString(currIntersec) + ". Rec level : "+ recLevel);
+		Main.say("current goal : " +intArrayToString(currGoal));
+		Main.say("--Adding " + (double) toAdd / Math.pow(this.nrFaces, this.nrDice) + " to the proba (" + toAdd + " favourable cases)");
+		Main.say("--Multiplying with Gain (" + gainForIntersection + ", greedy stragety) : adding " + toAdd*gainForIntersection  / Math.pow(this.nrFaces, this.nrDice) + " to the expectancy");
 
 //		outputIntersectionResults(currIntersec, currGoal, toAdd, gainForIntersection);
 		
 		return pairProbaExpect;
 	}
 
-//	private void outputIntersectionResults(Integer[] currIntersec,	Integer[] currGoal, double toAdd, int gainForIntersection) {
-//		System.out.println();
-//		System.out.println("current intersection : " + intArrayToString(currIntersec) + ". Rec level : "+ recLevel);
-//		System.out.println("current goal : " +intArrayToString(currGoal));
-//		System.out.println("--Adding " + (double) toAdd / Math.pow(this.nrFaces, this.nrDice) + " to the proba (" + toAdd + " favourable cases)");
-//		System.out.println("--Multiplying with Gain (" + gainForIntersection + ", greedy stragety) : adding " + toAdd*gainForIntersection  / Math.pow(this.nrFaces, this.nrDice) + " to the expectancy");
-//	}
 	
 	private int getGainForIntersection(WishTree tree, Integer[] currIntersec, int nrBranchesInIntersection) {
 		//this can depend on strategy, for instance, you might want to sacrifice points to keep more dice.
 		//this one is the greedy strategy, I always keep the highest gain.
-		Vector<Integer> gainVector = getGainFromIntersection(tree, currIntersec); 
+		Vector<Integer> gainVector = getBranchGains(tree, currIntersec); 
 		int gainToKeep;
 		
 		if (nrBranchesInIntersection%2 == 1){ //if we add the value, we want the highest gain 
@@ -166,14 +267,14 @@ public class CalculationsForSingleThrow { // this is wrong !!
 		return gainToKeep;
 	}
 
-	private Vector<Integer> getGainFromIntersection(WishTree tree, Integer[] currIntersec) {
+	private Vector<Integer> getBranchGains(WishTree tree, Integer[] currIntersec) {
 //		Integer[] gainArray = new Integer[nrBranchesInIntersection(currIntersec)];
 		Vector<Integer> gainArray = new Vector<>();
-//		System.out.println("Curr elements in intersection : ");
+//		Main.say("Curr elements in intersection : ");
 		for (int i = 0;i<currIntersec.length;i++){
 			if (currIntersec[i]==1){
 				WishTree currBranch = tree.getChildren().get(i);
-//				System.out.println(currBranch.toString());
+//				Main.say(currBranch.toString());
 				gainArray.add(currBranch.getGain());
 			}
 		}
@@ -192,7 +293,7 @@ public class CalculationsForSingleThrow { // this is wrong !!
 		int i = 0;
 		boolean weiter = true;
 		while ((i < tempChildren.size()) && weiter) {
-			Integer[] tempGoal = terminalBranchToGoal(tempChildren.get(i));
+			Integer[] tempGoal = terminalBranchToGoal(tempChildren.get(i), nrFaces);
 			Integer[] testGoal = intersectTwoGoals(currGoal, tempGoal);
 			int testSize = sizeOfGoal(testGoal);
 			if (testSize > this.nrDice) {
@@ -205,8 +306,45 @@ public class CalculationsForSingleThrow { // this is wrong !!
 
 		return currGoal;
 	}
+	
+	private void oldTest(int nrDice, long tempProd) {
+		double test = ((double) (factorielle(this.nrDice)) / (tempProd));
+		if (test != (long) test) {
+			Main.say("" + test + " should be an whole number");
+			Main.say("possible problem : nrDice! might be bigger than MAX INT ");
+			Main.say(" max int = " + Integer.MAX_VALUE + "; and (nrDice-1)! = " + factorielle(nrDice - 1));
+		}
+	}
 
-	public long ProbaBranch(Integer[] goal) {
+	public long ProbaBranch_new(Integer[] goal) {
+		long res;
+
+		
+		long tempProd = 1;
+		int remainingDice = this.nrDice;
+		for (int i = 0; i < nrFaces; i++) {
+			if (goal[i] != 0) {
+				tempProd *= bernouilliNrCases(remainingDice, goal[i], nrFaces);
+				remainingDice -= goal[i];
+			}
+			
+		}
+//		tempProd *= Math.pow(nrFaces, remainingDice);
+		
+		return tempProd;
+		
+		
+	}
+	
+	public long bernouilliNrCases(int n, int k, int nrFaces) {
+		//Warning : this never divides with the total nr cases and is therefore no proba but a nr of cases
+		long res = (long) (divFact(n, k)/factorielle(n-k));
+		res *= Math.pow(nrFaces-1, n-k);
+		
+		return res;
+	}
+	
+	public long ProbaBranch(Integer[] goal) { // changed the calculations for extra dice, TODO check if it breaks things
 
 		long res;
 
@@ -225,13 +363,15 @@ public class CalculationsForSingleThrow { // this is wrong !!
 				tempProd *= factorielle(goal[i]);
 			}
 
-			double test = ((double) (factorielle(this.nrDice)) / (tempProd));
-			if (test != (long) test) {
-				System.out.println("" + test + " should be an whole number");
-				System.out.println("possible problem : nrDice! might be bigger than MAX INT ");
-				System.out.println(" max int = " + Integer.MAX_VALUE + "; and (nrDice-1)! = " + factorielle(nrDice - 1));
-			}
+			
+			oldTest(nrDice, tempProd);
+			
+			
 			res = ((factorielle(this.nrDice)) / (tempProd));
+//			
+//			double chooseKAmongN = divFact(nrDice,extraDice)/factorielle(nrDice-extraDice);
+//			res = (long) ( ((factorielle(this.nrDice-extraDice))*chooseKAmongN) / (tempProd)  );
+			
 			return res;
 
 		} else { // if some dice do not have constraints, the proba of the goal
@@ -248,7 +388,6 @@ public class CalculationsForSingleThrow { // this is wrong !!
 				tempSum += ProbaBranch(newGoal);
 			}
 			return tempSum;
-
 		}
 
 	}
@@ -261,7 +400,10 @@ public class CalculationsForSingleThrow { // this is wrong !!
 				return stack.favourableCases;
 			}
 		}
-		// System.out.println("calculating new : ");
+//		
+		
+		// Main.say("calculating new : ");
+//		long favourableCases = ProbaBranch_new(goal);
 		long favourableCases = ProbaBranch(goal);
 		addToStacksWithProbas(goal, favourableCases);
 
@@ -323,9 +465,9 @@ public class CalculationsForSingleThrow { // this is wrong !!
 		}
 		
 		for (WishTree child : toRemove){
-			System.out.println("this node : " + child.toString() + "is greater than number of faces (" + nrFaces + "). Removing...");
+			Main.say("this node : " + child.toString() + "is greater than number of faces (" + nrFaces + "). Removing...");
 			developpedNormalisedTree.getChildren().remove(child);
-			System.out.println("removed");
+			Main.say("removed");
 		}
 	}
 
@@ -450,7 +592,7 @@ public class CalculationsForSingleThrow { // this is wrong !!
 	// ------------------------------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------------------------------------------------------------------------------------------
 
-	public Integer[] terminalBranchToGoal(WishTree terminalBranch) {
+	public static Integer[] terminalBranchToGoal(WishTree terminalBranch, int nrFaces) {
 		Integer[] goal = new Integer[nrFaces];
 		for (int i = 0; i < nrFaces; i++) {
 			goal[i] = occurencesOf(i + 1, terminalBranch);
@@ -459,9 +601,9 @@ public class CalculationsForSingleThrow { // this is wrong !!
 		return goal;
 	}
 
-	private int occurencesOf(int i, WishTree lastBranch) {
+	private static int occurencesOf(int i, WishTree lastBranch) {
 		int res = 0;
-		for (WishTree child : lastBranch.getChildren()) {
+		for (WishTree child : lastBranch.getChildren(false, false, true)) {
 			if (child.getNr() == i) {
 				res++;
 			}
@@ -483,7 +625,7 @@ public class CalculationsForSingleThrow { // this is wrong !!
 		if (i <= this.nrDice) {
 			return this.factoriels[i];
 		} else {
-			System.out.println("computing " + i + "!, but nrDice is "
+			Main.say("computing " + i + "!, but nrDice is "
 					+ this.nrDice);
 			long res = 1;
 
@@ -519,3 +661,14 @@ public class CalculationsForSingleThrow { // this is wrong !!
 
 	
 }
+
+
+
+
+//private void outputIntersectionResults(Integer[] currIntersec,	Integer[] currGoal, double toAdd, int gainForIntersection) {
+//	Main.say();
+//	Main.say("current intersection : " + intArrayToString(currIntersec) + ". Rec level : "+ recLevel);
+//	Main.say("current goal : " +intArrayToString(currGoal));
+//	Main.say("--Adding " + (double) toAdd / Math.pow(this.nrFaces, this.nrDice) + " to the proba (" + toAdd + " favourable cases)");
+//	Main.say("--Multiplying with Gain (" + gainForIntersection + ", greedy stragety) : adding " + toAdd*gainForIntersection  / Math.pow(this.nrFaces, this.nrDice) + " to the expectancy");
+//}
