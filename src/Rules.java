@@ -3,6 +3,8 @@ public class Rules {
 	
 	boolean canKeepMultipleGoalsPerThrow;
 	
+
+
 	boolean canRethrowKnownDice;
 	boolean canUseKnownDiceInPattern;
 	
@@ -19,6 +21,10 @@ public class Rules {
 
 	public boolean isCanKeepMultipleGoalsPerThrow() {
 		return canKeepMultipleGoalsPerThrow;
+	}
+	
+	public void setCanKeepMultipleGoalsPerThrow(boolean canKeepMultipleGoalsPerThrow) {
+		this.canKeepMultipleGoalsPerThrow = canKeepMultipleGoalsPerThrow;
 	}
 
 
